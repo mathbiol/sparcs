@@ -10,7 +10,7 @@ sparcs = function(){
         h+= '<ol id="sparcsYearsInfo"></ol>'
         cmdSide.innerHTML=h
         sparcs.countCounty()
-        //cmdSide.innerHTML +='<p>Checking data for years '+sparcs.years.join(', ')+' ...</p>'
+         .then(_=>sparcs.rangeUI())
     }
 }
 
@@ -26,6 +26,7 @@ sparcs.urls={
 sparcs.years=Object.getOwnPropertyNames(sparcs.urls)
 
 sparcs.countCounty=function(){
+    var pp =[] // promises
     sparcs.years.forEach(function(yr){
         sparcs.urls[yr].county={}
         var li = document.createElement('li')
@@ -35,7 +36,7 @@ sparcs.countCounty=function(){
         var url = sparcs.urls[yr].url
         // https://dev.socrata.com/docs/queries/
         // https://dev.socrata.com/docs/functions
-        mathbiol.sys.getJSON(url+'?$select=hospital_county,%20count(*)&$group=hospital_county',function(x){
+        pp.push($.getJSON(url+'?$select=hospital_county,%20count(*)&$group=hospital_county',function(x){
             sparcs.urls[yr].count=0
             x.forEach(function(xi){
                 xi.hospital_county=xi.hospital_county||'NA'
@@ -45,13 +46,50 @@ sparcs.countCounty=function(){
 
             })
             li.innerHTML='<b style="color:blue">'+yr+'</b>: found <b style="color:blue">'+sparcs.urls[yr].count.toLocaleString()+'</b> patient records in <b style="color:blue">'+Object.entries(sparcs.urls[yr].county).length+'</b> counties</span>'
-        })
-
-        4
+        }))
     })
-    4
+    //console.log(pp)
+    return Promise.all(pp)
 }
 
+sparcs.rangeUI=function(div){ // assemple UI with ranges
+    div=div||cmdResults // default div with id cmdResults
+    div.innerHTML='' // reset div
+    var h = '<table>'
+    h += '<thead>'
+        h += '<th>Year</th>'
+        h += '<th>County</th>'
+    h += '</thead>'
+    h += '<tbody>'
+        h += '<tr id="rangeTR"><tr>'
+    h += '<tbody>'
+    h += '</table>'
+    div.innerHTML=h
+    // years
+
+    var tdYear = document.createElement('td')
+    rangeTR.appendChild(tdYear)
+    tdYear.id='tdYear' // globalized via DOM, not JS (it will go away with the element's dismissal)
+    var h = '<select multiple id="tdYearSelect"></select>'
+    tdYear.innerHTML = h
+    // show years
+    sparcs.county={} // take the opportunity to list counties
+    sparcs.years.forEach(function(y){
+        var op = document.createElement('option')
+        tdYearSelect.appendChild(op)
+        op.value=op.textContent=y
+        Object.getOwnPropertyNames(sparcs.urls[y].county).forEach(function(c){
+            if(!sparcs.county[c]){sparcs.county[c]={}}
+            if(!sparcs.county[c][y]){sparcs.county[c][y]={}}
+            sparcs.county[c][y]=sparcs.urls[y].county[c].count
+        })
+    })
+    tdYearSelect.size=sparcs.years.length // to match number of years
+    // Counties
+    4
+    
+
+}
 
 
 
