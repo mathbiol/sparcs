@@ -27,6 +27,10 @@ sparcs.years=Object.getOwnPropertyNames(sparcs.urls)
 
 sparcs.countCounty=function(){
     var pp =[] // promises
+    // get variables
+    pp.push($.getJSON('https://health.data.ny.gov/resource/pzzw-8zdv.json?$limit=1',function(x){ // sampling one reccord from 2014
+        sparcs.vars=Object.getOwnPropertyNames(x[0])
+    }))
     sparcs.years.forEach(function(yr){
         sparcs.urls[yr].county={}
         var li = document.createElement('li')
@@ -55,11 +59,13 @@ sparcs.countCounty=function(){
 sparcs.rangeUI=function(div){ // assemple UI with ranges
     div=div||cmdResults // default div with id cmdResults
     div.innerHTML='' // reset div
-    var h = '<table>'
-    h += '<thead>'
+    var h = '<table id="sparcsTable" style="margin:20px">'
+    h += '<thead><tr>'
         h += '<th>Year</th>'
         h += '<th>County</th>'
-    h += '</thead>'
+        h += '<th id="thVar">Var1:<select id="selectVar1"></select>, Var2:<select id="selectVar2"></select></th>'
+        h += '<th id="thPlot"><div id="divPlot"></div></th>'
+    h += '</tr></thead>'
     h += '<tbody>'
         h += '<tr id="rangeTR"><tr>'
     h += '<tbody>'
@@ -70,8 +76,8 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     var tdYear = document.createElement('td')
     rangeTR.appendChild(tdYear)
     tdYear.id='tdYear' // globalized via DOM, not JS (it will go away with the element's dismissal)
-    var h = '<select multiple id="tdYearSelect"></select>'
-    tdYear.innerHTML = h
+    tdYear.style.verticalAlign="top"
+    tdYear.innerHTML = '<select multiple id="tdYearSelect"></select>'
     // show years
     sparcs.county={} // take the opportunity to list counties
     sparcs.years.forEach(function(y){
@@ -86,6 +92,19 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     })
     tdYearSelect.size=sparcs.years.length // to match number of years
     // Counties
+    var tdCounty = document.createElement('td')
+    rangeTR.appendChild(tdCounty)
+    tdCounty.id='tdCounty' // globalized via DOM, not JS (it will go away with the element's dismissal)
+    tdCounty.style.verticalAlign="top"
+    tdCounty.innerHTML = '<select id="tdCountySelect"></select>'
+    Object.getOwnPropertyNames(sparcs.county).forEach(function(c){
+        var op = document.createElement('option')
+        tdCountySelect.appendChild(op)
+        op.value=op.textContent=c
+    })
+    //tdCountySelect.size=Object.getOwnPropertyNames(sparcs.county).length
+    tdCountySelect.size=20
+
     4
     
 
