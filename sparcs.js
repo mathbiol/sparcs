@@ -77,12 +77,12 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     rangeTR.appendChild(tdYear)
     tdYear.id='tdYear' // globalized via DOM, not JS (it will go away with the element's dismissal)
     tdYear.style.verticalAlign="top"
-    tdYear.innerHTML = '<select multiple id="tdYearSelect"></select>'
+    tdYear.innerHTML = '<select multiple id="yearSelect"></select>'
     // show years
     sparcs.county={} // take the opportunity to list counties
     sparcs.years.forEach(function(y){
         var op = document.createElement('option')
-        tdYearSelect.appendChild(op)
+        yearSelect.appendChild(op)
         op.value=op.textContent=y
         Object.getOwnPropertyNames(sparcs.urls[y].county).forEach(function(c){
             if(!sparcs.county[c]){sparcs.county[c]={}}
@@ -90,24 +90,69 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
             sparcs.county[c][y]=sparcs.urls[y].county[c].count
         })
     })
-    tdYearSelect.size=sparcs.years.length // to match number of years
+    yearSelect.size=sparcs.years.length // to match number of years
     // Counties
     var tdCounty = document.createElement('td')
     rangeTR.appendChild(tdCounty)
     tdCounty.id='tdCounty' // globalized via DOM, not JS (it will go away with the element's dismissal)
     tdCounty.style.verticalAlign="top"
-    tdCounty.innerHTML = '<select id="tdCountySelect"></select>'
+    tdCounty.innerHTML = '<select id="countySelect"></select>'
     Object.getOwnPropertyNames(sparcs.county).forEach(function(c){
         var op = document.createElement('option')
-        tdCountySelect.appendChild(op)
+        countySelect.appendChild(op)
         op.value=op.textContent=c
     })
-    //tdCountySelect.size=Object.getOwnPropertyNames(sparcs.county).length
-    tdCountySelect.size=20
+    countySelect.size=20
+    // selectVars
+    sparcs.vars.forEach(function(vr){
+        var op1 = document.createElement('option')
+        var op2 = document.createElement('option')
+        op1.textContent=op2.textContent=vr
+        selectVar1.appendChild(op1)
+        selectVar2.appendChild(op2)
 
-    4
-    
+    })
+    var tdVars = document.createElement('td')
+    tdVars.id="tdVars"
+    rangeTR.appendChild(tdVars)
+    //var tblVars = document.createElement('table') // tabulation of var1 with var2
+    //tblVars.id="tblVars" // we'll tabulate here
+    //tdVars.appendChild(tblVars)
+    // metadata
+    sparcs.varInfo={}
+    sparcs.vars.forEach(function(v){
+        sparcs.varInfo[v]={'type':'str'}
+        var numTypes=["total_charges", "total_costs"]
+        if(numTypes.indexOf(v)>=0){
+            sparcs.varInfo[v].type='num'
+        }
+    })
+    // default selections
+    countySelect.selectedIndex=Object.getOwnPropertyNames(sparcs.county).indexOf("Suffolk")
+    yearSelect.selectedIndex=yearSelect.options.length-1 // last year available
+    selectVar1.selectedIndex=sparcs.vars.indexOf('ccs_diagnosis_description')
+    selectVar2.selectedIndex=sparcs.vars.indexOf('facility_name')
 
+    sparcs.tabulate()
+}
+
+sparcs.tabulate=function(){ // tabulate variable selections
+    var url = sparcs.urls[yearSelect.value].url
+    //var q = '?$where=hospital_county='+countySelect.value+'&$SELECT= '+selectVar1.value+', '+selectVar2.value+', COUNT(*) as count GROUP BY '+selectVar1.value+', '+selectVar2.value
+    //var q = '?$query = SELECT '+selectVar1.value+', '+selectVar2.value+', COUNT(*) as count GROUP BY '+selectVar1.value+', '+selectVar2.value+' WHERE +hospital_county='+countySelect.value
+    var q = '?$SELECT='+selectVar1.value+', '+selectVar2.value+', COUNT(*) as count&$group='+selectVar1.value+', '+selectVar2.value+'&$where=hospital_county="'+countySelect.value+'"'
+    //var q = '?$SELECT= '+selectVar1.value+', '+selectVar2.value+', COUNT(*) as count GROUP BY '+selectVar1.value+', '+selectVar2.value
+    $.getJSON(url+q,function(x){
+        tdVars.innerHTML.innerHTML='' //reset
+        tdVars.appendChild(sparcs.tabCount(x))
+    })
+    //debugger
+}
+
+sparcs.tabCount=function(x){
+    var tb = document.createElement('table')
+    return tb
+    //debugger
 }
 
 
