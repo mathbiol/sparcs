@@ -162,3 +162,5 @@ sparcs.tabCount=function(x){
 
 sparcs()
 
+mathbiol.andrej=function(x){alert('Andrej says "'+x+'"')}
+
