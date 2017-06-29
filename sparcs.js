@@ -5,12 +5,15 @@ sparcs = function(){
     console.log('sparcs.js ini')
     // --- if being called from MATHBIOL --- //
     if(window['mathbiol']&&cmdSide){
-        let h = '<p><b style="color:maroon;font-size:large">SPARCS</b>: New York Statewide Planning and Research Cooperative System (SPARCS) Inpatient De-Identified dataset </p>'
+        let h = '<p><b style="color:maroon;font-size:large">SPARCS</b>: New York Statewide Planning and Research Cooperative System (<a href="https://www.health.ny.gov/statistics/sparcs/" target="_blank">SPARCS</a>) Inpatient De-Identified dataset </p>'
         //cmdSide.innerHTML +='<h4 id="sparcsCountyHead"><span id="sparcsCounty">Suffolk</span></h4>'
         h+= '<ol id="sparcsYearsInfo"></ol>'
+        h+= '<p>for more information type <span id="typeHelpSparcs" style="background-color:black;color:yellowgreen;cursor:pointer">&nbsp;help sparcs&nbsp;</span> (or click on me).</p>'
         cmdSide.innerHTML=h
-        sparcs.countCounty()
-         .then(_=>sparcs.rangeUI())
+        sparcs.countCounty().then(_=>sparcs.rangeUI())
+        typeHelpSparcs.onclick=function(){
+            mathbiol.sys.cmdSlow('help sparcs')
+        }
     }
 }
 
@@ -49,7 +52,7 @@ sparcs.countCounty=function(){
                 4
 
             })
-            li.innerHTML='<b style="color:blue">'+yr+'</b>: found <b style="color:blue">'+sparcs.urls[yr].count.toLocaleString()+'</b> patient records in <b style="color:blue">'+Object.entries(sparcs.urls[yr].county).length+'</b> counties</span>'
+            li.innerHTML='For <b style="color:blue">'+yr+'</b> found <b style="color:blue">'+sparcs.urls[yr].count.toLocaleString()+'</b> patient records in <b style="color:blue">'+Object.entries(sparcs.urls[yr].county).length+'</b> counties</span>'
         }))
     })
     //console.log(pp)
@@ -215,6 +218,16 @@ sparcs.tabCount=function(x){
     //debugger
 }
 
+sparcs.count=function(){
+    var c=0;
+    y={total:0}
+    sparcs.years.forEach(function(yr){
+        y.total += sparcs.urls[yr].count
+        y[yr] = sparcs.urls[yr].count
+    })
+    return JSON.stringify(y,null,3)
+}
+
 
 
 
@@ -223,7 +236,31 @@ sparcs.tabCount=function(x){
 sparcs()
 
 if(typeof(mathbiol)){
+
     mathbiol.andrejs=function(x){alert('Andrejs says "'+x+'"')}
+    mathbiol.sparcs=function(cmd){
+        if(!cmd){
+            return '"sparcs" command is under development, do "help sparcs" for more'
+        }
+    }
+    mathbiol.sparcs.count = sparcs.count
+    mathbiol.sparcs.about='New York Statewide Planning and Research Cooperative System (<a href="https://www.health.ny.gov/statistics/sparcs/" target="_blank">SPARCS</a>)'
+   typeCmd=function(that){
+        mathbiol.sys.cmdSlow(that.textContent+'()')
+    }
+    mathbiol.sparcs.help=function(){
+        var h = 'This command was loaded as part of the "sparcs" module <a href="https://github.com/mathbiol/sparcs" target="_blank"><i class="fa fa-github-alt" aria-hidden="true"></i></a>'
+        h +=' developed to analyse the public data of New York Statewide Planning and Research Cooperative System (<a href="https://www.health.ny.gov/statistics/sparcs/" target="_blank">SPARCS</a>).'
+        h +=' The following commands are provided with sparcs:'
+        h +='<h4 style="color:maroon">Commands</h4>'
+        h +='<li><span style="color:yellowgreen;background-color:black;cursor:pointer" onclick="typeCmd(this)"> sparcs.count </span> [not coded yet]</li>'
+        h +='<li>...</li>'
+        setTimeout(function(){
+            mathbiol.msg(mathbiol.sparcs.about)
+        },200)
+        return h
+    }
+    
 }
 
 
