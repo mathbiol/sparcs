@@ -151,6 +151,54 @@ sparcs.tabulate=function(){ // tabulate variable selections
 
 sparcs.tabCount=function(x){
     var tb = document.createElement('table')
+    // assemble table
+    var colName = selectVar2.value, rowName = selectVar1.value
+    var colVals = {}, rowVals = {}
+    x.forEach(function(v){
+        colVals[v[colName]]=true
+        rowVals[v[rowName]]=true
+        //debugger
+    })
+    colVals=Object.getOwnPropertyNames(colVals).sort()
+    rowVals=Object.getOwnPropertyNames(rowVals).sort()
+    sparcs.table={colVals:colVals,rowVals:rowVals,tbl:tb,tds:[]} // mapping table to sparcs object
+    // table header
+    var tbh = document.createElement('thead') // head of the counts table
+    tb.appendChild(tbh)
+    var th0 = document.createElement('th') // corner cell
+    tbh.appendChild(th0)
+    th0.innerHTML=colName+'<br>'+rowName
+    colVals.forEach(function(c){
+        var th = document.createElement('th')
+        tbh.appendChild(th)
+        th.textContent=c
+    })
+    var tbd = document.createElement('tbody') // body of the counts table
+    tb.appendChild(tbd)
+    rowVals.forEach(function(r,i){
+        sparcs.table.tds[i]=[]
+        var tr = document.createElement('tr')
+        tbd.appendChild(tr)
+        var th = document.createElement('th') // row label
+        tr.appendChild(th)
+        th.textContent=r
+        colVals.forEach(function(c,j){
+            var td = document.createElement('td')
+            td.textContent="0"
+            td.align="center"
+            tr.appendChild(td)
+            sparcs.table.tds[i][j]=td
+        })
+    })
+    // Fill table
+    x.forEach(function(xi){
+        var i = rowVals.indexOf(xi[rowName])
+        var j = colVals.indexOf(xi[colName])
+        sparcs.table.tds[i][j].textContent=xi.count
+    })
+    
+
+
     return tb
     //debugger
 }
@@ -162,5 +210,8 @@ sparcs.tabCount=function(x){
 
 sparcs()
 
-mathbiol.andrej=function(x){alert('Andrej says "'+x+'"')}
+if(typeof(mathbiol)){
+    mathbiol.andrejs=function(x){alert('Andrejs says "'+x+'"')}
+}
+
 
