@@ -16,12 +16,12 @@ sparcs = function(){
 
 
 sparcs.urls={
-    "2009":{url:"https://health.data.ny.gov/resource/s8d9-z734.json"},
-    "2010":{url:"https://health.data.ny.gov/resource/dpew-wqcg.json"},
-    "2011":{url:"https://health.data.ny.gov/resource/n5y9-zanf.json"},
-    "2012":{url:"https://health.data.ny.gov/resource/rv8x-4fm3.json"},
-    "2013":{url:"https://health.data.ny.gov/resource/tdf6-7fpk.json"},
-    "2014":{url:"https://health.data.ny.gov/resource/pzzw-8zdv.json"}
+    "2009":{url:"https://health.data.ny.gov/resource/s8d9-z734"},
+    "2010":{url:"https://health.data.ny.gov/resource/dpew-wqcg"},
+    "2011":{url:"https://health.data.ny.gov/resource/n5y9-zanf"},
+    "2012":{url:"https://health.data.ny.gov/resource/rv8x-4fm3"},
+    "2013":{url:"https://health.data.ny.gov/resource/tdf6-7fpk"},
+    "2014":{url:"https://health.data.ny.gov/resource/pzzw-8zdv"}
 }
 sparcs.years=Object.getOwnPropertyNames(sparcs.urls)
 
@@ -104,7 +104,9 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     })
     countySelect.size=20
     // selectVars
-    sparcs.vars.forEach(function(vr){
+    var vars = JSON.parse(JSON.stringify(sparcs.vars)) // clone array
+    vars.splice(sparcs.vars.indexOf("hospital_county"),1)
+    vars.forEach(function(vr){
         var op1 = document.createElement('option')
         var op2 = document.createElement('option')
         op1.textContent=op2.textContent=vr
@@ -113,12 +115,9 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
 
     })
     var tdVars = document.createElement('td')
+    tdVars.style.verticalAlign="top"
     tdVars.id="tdVars"
     rangeTR.appendChild(tdVars)
-    //var tblVars = document.createElement('table') // tabulation of var1 with var2
-    //tblVars.id="tblVars" // we'll tabulate here
-    //tdVars.appendChild(tblVars)
-    // metadata
     sparcs.varInfo={}
     sparcs.vars.forEach(function(v){
         sparcs.varInfo[v]={'type':'str'}
@@ -132,25 +131,31 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     yearSelect.selectedIndex=yearSelect.options.length-1 // last year available
     selectVar1.selectedIndex=sparcs.vars.indexOf('ccs_diagnosis_description')
     selectVar2.selectedIndex=sparcs.vars.indexOf('facility_name')
-
     sparcs.tabulate()
+    selectVar1.onchange=selectVar2.onchange=yearSelect.onchange=countySelect.onchange=function(){
+        mathbiol.msg('loading count table ...','red')
+        sparcs.tabulate()
+    }
 }
 
 sparcs.tabulate=function(){ // tabulate variable selections
-    var url = sparcs.urls[yearSelect.value].url
-    //var q = '?$where=hospital_county='+countySelect.value+'&$SELECT= '+selectVar1.value+', '+selectVar2.value+', COUNT(*) as count GROUP BY '+selectVar1.value+', '+selectVar2.value
-    //var q = '?$query = SELECT '+selectVar1.value+', '+selectVar2.value+', COUNT(*) as count GROUP BY '+selectVar1.value+', '+selectVar2.value+' WHERE +hospital_county='+countySelect.value
+    var url = sparcs.urls[yearSelect.value].url+'.json'
     var q = '?$SELECT='+selectVar1.value+', '+selectVar2.value+', COUNT(*) as count&$group='+selectVar1.value+', '+selectVar2.value+'&$where=hospital_county="'+countySelect.value+'"'
-    //var q = '?$SELECT= '+selectVar1.value+', '+selectVar2.value+', COUNT(*) as count GROUP BY '+selectVar1.value+', '+selectVar2.value
-    $.getJSON(url+q,function(x){
-        tdVars.innerHTML.innerHTML='' //reset
+    $.getJSON(url+q)
+     .then(function(x){
+        tdVars.innerHTML='' //reset
         tdVars.appendChild(sparcs.tabCount(x))
+        mathbiol.msg('loading count table ... done')
+    }).fail(function(err){
+        mathbiol.msg(err.statusText,'red')
+        tdVars.innerHTML='<p style="color:red" align="center">Bad Request</p>'
     })
-    //debugger
 }
 
 sparcs.tabCount=function(x){
     var tb = document.createElement('table')
+    tb.border=true
+    tb.style.borderColor='silver'
     // assemble table
     var colName = selectVar2.value, rowName = selectVar1.value
     var colVals = {}, rowVals = {}
@@ -185,8 +190,8 @@ sparcs.tabCount=function(x){
         colVals.forEach(function(c,j){
             var td = document.createElement('td')
             td.textContent="0"
-            td.align="center"
             tr.appendChild(td)
+            td.align="center"
             sparcs.table.tds[i][j]=td
         })
     })
@@ -194,7 +199,14 @@ sparcs.tabCount=function(x){
     x.forEach(function(xi){
         var i = rowVals.indexOf(xi[rowName])
         var j = colVals.indexOf(xi[colName])
-        sparcs.table.tds[i][j].textContent=xi.count
+        var url = sparcs.urls[yearSelect.value].url+'.csv'
+        var q = '?hospital_county='+countySelect.value
+        q += '&'+selectVar1.value+'='+rowVals[i]+''
+        q += '&'+selectVar2.value+'='+colVals[j]+''
+        if(!q.match('undefined')){
+            sparcs.table.tds[i][j].innerHTML='<a href="'+url+q+'" target="_blank">'+xi.count+'</a>'
+        }
+        
     })
     
 
