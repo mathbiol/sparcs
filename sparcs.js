@@ -249,10 +249,9 @@ if(typeof(mathbiol)){
         mathbiol.sys.cmdSlow(that.textContent+'()')
     }
     mathbiol.sparcs.help=function(){
-        var h = 'This command was loaded as part of the "sparcs" module <a href="https://github.com/mathbiol/sparcs" target="_blank"><i class="fa fa-github-alt" aria-hidden="true"></i></a>'
+        var h = 'This command was loaded as part of the <a href="https://github.com/mathbiol/sparcs" target="_blank">"sparcs" module <i class="fa fa-github-alt" aria-hidden="true"></i></a>'
         h +=' developed to analyse the public data of New York Statewide Planning and Research Cooperative System (<a href="https://www.health.ny.gov/statistics/sparcs/" target="_blank">SPARCS</a>).'
-        h +=' The following commands are provided with sparcs:'
-        h +='<h4 style="color:maroon">Commands</h4>'
+        h +='<br><b style="color:maroon"> SPARCS Methods</b>:'
         h +='<li><span style="color:yellowgreen;background-color:black;cursor:pointer" onclick="typeCmd(this)">sparcs.count</span> counts patient entries per year</li>'
         h +='<li><span style="color:yellowgreen;background-color:black;cursor:pointer" onclick="typeCmd(this)">sparcs.help</span> the function operated by "help sparcs".</li>'
         h +='<li>...</li>'
