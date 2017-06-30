@@ -28,12 +28,49 @@ sparcs.urls={
 }
 sparcs.years=Object.getOwnPropertyNames(sparcs.urls)
 
+sparcs.getJSON=function(url){
+    return new Promise(function(resolve, reject) {
+      // do a thing, possibly async, then…
+      localforage.getItem(url)
+        .then(function(x){
+            if(x){
+                resolve(x)
+            }else{
+                $.getJSON(url)
+                 .then(function(x){
+                  localforage.setItem(url,x)
+                  resolve(x)
+                })
+                 .fail(function(err){reject(err)})
+            }})
+    })
+}
+
+
+/*
+sparcs.getJSON=function(url,fun,err){
+    localforage.getItem(url)
+     .then(function(x){fun(x)})
+     .catch(function(){
+         $.getJSON(url)
+          .then(function(x){
+              localforage.setItem(url,x)
+              fun(x)
+          })
+          .fail(function(x){err(x)})
+     })
+}
+*/
+
 sparcs.countCounty=function(){
     var pp =[] // promises
     // get variables
-    pp.push($.getJSON('https://health.data.ny.gov/resource/pzzw-8zdv.json?$limit=1',function(x){ // sampling one reccord from 2014
-        sparcs.vars=Object.getOwnPropertyNames(x[0])
-    }))
+    pp.push(
+        sparcs.getJSON('https://health.data.ny.gov/resource/pzzw-8zdv.json?$limit=1')
+         .then(function(x){ // sampling one reccord from 2014
+            sparcs.vars=Object.getOwnPropertyNames(x[0])
+          })
+    )
     sparcs.years.forEach(function(yr){
         sparcs.urls[yr].county={}
         var li = document.createElement('li')
@@ -43,7 +80,8 @@ sparcs.countCounty=function(){
         var url = sparcs.urls[yr].url
         // https://dev.socrata.com/docs/queries/
         // https://dev.socrata.com/docs/functions
-        pp.push($.getJSON(url+'?$select=hospital_county,%20count(*)&$group=hospital_county',function(x){
+        pp.push(sparcs.getJSON(url+'?$select=hospital_county,%20count(*)&$group=hospital_county')
+         .then(function(x){
             sparcs.urls[yr].count=0
             x.forEach(function(xi){
                 xi.hospital_county=xi.hospital_county||'NA'
@@ -108,7 +146,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     countySelect.size=20
     // selectVars
     var vars = JSON.parse(JSON.stringify(sparcs.vars)) // clone array
-    vars.splice(sparcs.vars.indexOf("hospital_county"),1)
+    //vars.splice(sparcs.vars.indexOf("hospital_county"),1)
     vars.forEach(function(vr){
         var op1 = document.createElement('option')
         var op2 = document.createElement('option')
@@ -144,15 +182,27 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
 sparcs.tabulate=function(){ // tabulate variable selections
     var url = sparcs.urls[yearSelect.value].url+'.json'
     var q = '?$SELECT='+selectVar1.value+', '+selectVar2.value+', COUNT(*) as count&$group='+selectVar1.value+', '+selectVar2.value+'&$where=hospital_county="'+countySelect.value+'"'
-    $.getJSON(url+q)
+    
+    sparcs.getJSON(url+q)
      .then(function(x){
         tdVars.innerHTML='' //reset
         tdVars.appendChild(sparcs.tabCount(x))
         mathbiol.msg('loading count table ... done')
-    }).fail(function(err){
+    }).catch(function(err){
         mathbiol.msg(err.statusText,'red')
         tdVars.innerHTML='<p style="color:red" align="center">Bad Request</p>'
     })
+    
+    /*
+    sparcs.getJSON(url+q,function(x){
+        tdVars.innerHTML='' //reset
+        tdVars.appendChild(sparcs.tabCount(x))
+        mathbiol.msg('loading count table ... done')
+    },function(err){
+        mathbiol.msg(err.statusText,'red')
+        tdVars.innerHTML='<p style="color:red" align="center">Bad Request</p>'
+    })
+    */
 }
 
 sparcs.tabCount=function(x){
