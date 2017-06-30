@@ -253,7 +253,8 @@ if(typeof(mathbiol)){
         h +=' developed to analyse the public data of New York Statewide Planning and Research Cooperative System (<a href="https://www.health.ny.gov/statistics/sparcs/" target="_blank">SPARCS</a>).'
         h +=' The following commands are provided with sparcs:'
         h +='<h4 style="color:maroon">Commands</h4>'
-        h +='<li><span style="color:yellowgreen;background-color:black;cursor:pointer" onclick="typeCmd(this)">sparcs.count</span> [not coded yet]</li>'
+        h +='<li><span style="color:yellowgreen;background-color:black;cursor:pointer" onclick="typeCmd(this)">sparcs.count</span> counts patient entries per year</li>'
+        h +='<li><span style="color:yellowgreen;background-color:black;cursor:pointer" onclick="typeCmd(this)">sparcs.help</span> the function operated by "help sparcs".</li>'
         h +='<li>...</li>'
         setTimeout(function(){
             mathbiol.msg(mathbiol.sparcs.about)
