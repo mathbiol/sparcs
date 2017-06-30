@@ -3,4 +3,4 @@ SPARCS analytics
 
 ___
 
-Live at [https://mathbiol.github.io/#load sparcs](https://mathbiol.github.io/#load sparcs) !
+Live at [https://mathbiol.github.io/#load sparcs](https://mathbiol.github.io/#load%20sparcs) !
