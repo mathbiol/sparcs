@@ -104,7 +104,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     h += '<thead><tr>'
         h += '<th>Year</th>'
         h += '<th>County</th>'
-        h += '<th id="thVar">Var1:<select id="selectVar1"></select>, Var2:<select id="selectVar2"></select></th>'
+        h += '<th id="thVar">Var1:<select id="selectVar1" style="color:green"></select>, Var2:<select id="selectVar2" style="color:navy"></select></th>'
         h += '<th id="thPlot"><div id="divPlot"></div></th>'
     h += '</tr></thead>'
     h += '<tbody>'
@@ -185,7 +185,7 @@ sparcs.tabulate=function(){ // tabulate variable selections
     
     sparcs.getJSON(url+q)
      .then(function(x){
-        tdVars.innerHTML='' //reset
+        tdVars.innerHTML=''//'<div id="plotlyBarChartDiv"></div>' //reset
         tdVars.appendChild(sparcs.tabCount(x))
         mathbiol.msg('loading count table ... done')
     }).catch(function(err){
@@ -225,10 +225,12 @@ sparcs.tabCount=function(x){
     tb.appendChild(tbh)
     var th0 = document.createElement('th') // corner cell
     tbh.appendChild(th0)
-    th0.innerHTML=colName+'<br>'+rowName
+    th0.innerHTML=colName+'<br>_______<br>'+rowName
+    th0.style.color='maroon'
     colVals.forEach(function(c){
         var th = document.createElement('th')
         tbh.appendChild(th)
+        tbh.style.color='navy'
         th.textContent=c
     })
     var tbd = document.createElement('tbody') // body of the counts table
@@ -247,6 +249,36 @@ sparcs.tabCount=function(x){
             td.align="center"
             sparcs.table.tds[i][j]=td
         })
+        th.i = i
+        th.r=r
+        th.style.cursor='pointer'
+        th.style.color='green'
+        th.onclick=function(){
+            var i = this.i
+            var y = Object.keys(sparcs.table.tds[i]).map(function(k){
+                return parseInt(sparcs.table.tds[i][k].textContent)
+            })
+            // assemble plot
+            cmdSide.innerHTML='<div id="plotlyBarChartDiv"></div>'
+            Plotly.newPlot('plotlyBarChartDiv',
+                [
+                  {
+                    x: sparcs.table.colVals,
+                    y: y,
+                    type: 'bar'
+                  }
+                ],
+                {
+                    height:cmd.clientHeight+50,
+                    title:this.r,
+                    yaxis: {
+                        title: 'patient count'
+                    }
+                }
+            )
+            //plotlyBarChartDiv.innerHTML=''
+            //Plotly.newPlot('plotlyBarChartDiv', data);
+        }
     })
     // Fill table
     x.forEach(function(xi){
@@ -255,14 +287,36 @@ sparcs.tabCount=function(x){
         var url = sparcs.urls[yearSelect.value].url+'.csv'
         var q = '?hospital_county='+countySelect.value
         q += '&'+selectVar1.value+'='+rowVals[i]+''
-        q += '&'+selectVar2.value+'='+colVals[j]+''
+        if(selectVar2.value!=="hospital_county"){ // in case one is aggregating results as a single column
+            q += '&'+selectVar2.value+'='+colVals[j]+''
+        }
         if(!q.match('undefined')){
             sparcs.table.tds[i][j].innerHTML='<a href="'+url+q+'" target="_blank">'+xi.count+'</a>'
         }
         
     })
-    
+    th0.style.cursor='pointer'
+    th0.onclick=function(){
+        var traces = sparcs.table.rowVals.map(function(r,i){
+            return {
+                x:sparcs.table.colVals,
+                y:sparcs.table.tds[i].map(function(td){return parseInt(td.textContent)}),
+                name:r,
+                type:'bar'
+            }
+        })
+        cmdSide.innerHTML='<div id="plotlyBarChartDiv"></div>'
+        Plotly.newPlot('plotlyBarChartDiv',traces,{
+            barmode:'stack',
+            height:cmd.clientHeight+50,
+            title:selectVar1.value,
+            yaxis: {
+                title: 'patient count'
+            }
 
+        })
+        //debugger
+    }
 
     return tb
     //debugger
