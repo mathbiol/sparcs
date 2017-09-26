@@ -104,7 +104,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     h += '<thead><tr>'
         h += '<th>Year</th>'
         h += '<th>County</th>'
-        h += '<th id="thVar">Var1:<select id="selectVar1" style="color:green"></select>, Var2:<select id="selectVar2" style="color:navy"></select></th>'
+        h += '<th id="thVar">Var1:<select id="selectVar1" style="color:green"></select> <i class="fa fa-arrows-h" aria-hidden="true" style="color:orange;cursor:pointer" id="reverseVarSelection"></i> Var2:<select id="selectVar2" style="color:navy"></select></th>'
         h += '<th id="thPlot"><div id="divPlot"></div></th>'
     h += '</tr></thead>'
     h += '<tbody>'
@@ -113,6 +113,16 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     h += '</table>'
     div.innerHTML=h
     // years
+
+    reverseVarSelection.onclick=function(){
+        var s1 = selectVar1.selectedIndex
+        var s2 = selectVar2.selectedIndex
+        selectVar1.selectedIndex=s2
+        selectVar2.selectedIndex=s1
+        selectVar2.onchange()
+
+        //debugger
+    }
 
     var tdYear = document.createElement('td')
     rangeTR.appendChild(tdYear)
@@ -153,7 +163,8 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
         op1.textContent=op2.textContent=vr
         selectVar1.appendChild(op1)
         selectVar2.appendChild(op2)
-
+        //selectVar2.onchange()
+        //sparcs.tabulate()
     })
     var tdVars = document.createElement('td')
     tdVars.style.verticalAlign="top"
