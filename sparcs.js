@@ -188,6 +188,7 @@ sparcs.tabulate=function(){ // tabulate variable selections
         tdVars.innerHTML=''//'<div id="plotlyBarChartDiv"></div>' //reset
         tdVars.appendChild(sparcs.tabCount(x))
         mathbiol.msg('loading count table ... done')
+        sparcs.clickAgain()
     }).catch(function(err){
         mathbiol.msg(err.statusText,'red')
         tdVars.innerHTML='<p style="color:red" align="center">Bad Request</p>'
@@ -203,6 +204,12 @@ sparcs.tabulate=function(){ // tabulate variable selections
         tdVars.innerHTML='<p style="color:red" align="center">Bad Request</p>'
     })
     */
+}
+
+sparcs.toArray=function(obj){
+    var y = []
+    obj.forEach(function(xi){y.push(xi)})
+    return y
 }
 
 sparcs.tabCount=function(x){
@@ -227,11 +234,40 @@ sparcs.tabCount=function(x){
     tbh.appendChild(th0)
     th0.innerHTML=colName+'<br>_______<br>'+rowName
     th0.style.color='maroon'
+    th0.id="cornerth0"
     colVals.forEach(function(c){
         var th = document.createElement('th')
         tbh.appendChild(th)
         tbh.style.color='navy'
         th.textContent=c
+        th.style.cursor='pointer'
+        th.onclick=function(){
+            cmdSide.innerHTML='<div id="plotlyBarChartDiv"></div>'
+            var col=this.textContent
+            var i = sparcs.table.colVals.indexOf(this.textContent)
+            sparcs.clicked=this
+            Plotly.newPlot('plotlyBarChartDiv',
+                [
+                  {
+                    x: sparcs.table.tds.map(function(td){
+                        return parseInt(td[i].textContent)
+                    }),
+                    y: sparcs.table.rowVals,
+                    orientation: 'h',
+                    type: 'bar'
+                  }
+                ],
+                {
+                    height:cmd.clientHeight+50,
+                    title:selectVar1.value+' for '+col+' ('+countySelect.value+' '+yearSelect.value+')',
+                    xaxis: {
+                        title: 'patient count'
+                    }
+                }
+            )
+        
+        }
+        
     })
     var tbd = document.createElement('tbody') // body of the counts table
     tb.appendChild(tbd)
@@ -260,6 +296,7 @@ sparcs.tabCount=function(x){
             })
             // assemble plot
             cmdSide.innerHTML='<div id="plotlyBarChartDiv"></div>'
+            sparcs.clicked=this
             Plotly.newPlot('plotlyBarChartDiv',
                 [
                   {
@@ -270,7 +307,7 @@ sparcs.tabCount=function(x){
                 ],
                 {
                     height:cmd.clientHeight+50,
-                    title:this.r,
+                    title:this.r+' by '+selectVar2.value+' ('+countySelect.value+' '+yearSelect.value+')',
                     yaxis: {
                         title: 'patient count'
                     }
@@ -306,10 +343,11 @@ sparcs.tabCount=function(x){
             }
         })
         cmdSide.innerHTML='<div id="plotlyBarChartDiv"></div>'
+        sparcs.clicked=this
         Plotly.newPlot('plotlyBarChartDiv',traces,{
             barmode:'stack',
             height:cmd.clientHeight+50,
-            title:selectVar1.value,
+            title:selectVar1.value+' vs '+selectVar2.value+' ('+countySelect.value+' '+yearSelect.value+')',
             yaxis: {
                 title: 'patient count'
             }
@@ -320,6 +358,21 @@ sparcs.tabCount=function(x){
 
     return tb
     //debugger
+}
+
+sparcs.clickAgain=function(){
+    if(sparcs.clicked){
+        if(sparcs.clicked.id==="cornerth0"){
+            sparcs.clicked.click()
+        }else{
+            sparcs.toArray(document.querySelectorAll('th'))
+              .filter(function(th){return th.textContent.toLowerCase()===sparcs.clicked.textContent.toLowerCase()})
+              .forEach(function(th){ // just should be just one, or none
+                  th.click()
+                  console.log('clicked automatically on ',th) // let's track it here
+              })
+        }
+    }   
 }
 
 sparcs.count=function(){
