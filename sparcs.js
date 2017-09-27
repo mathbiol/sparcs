@@ -104,7 +104,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     h += '<thead><tr>'
         h += '<th>Year</th>'
         h += '<th>County</th>'
-        h += '<th id="thVar">Var1:<select id="selectVar1" style="color:green"></select> <i class="fa fa-arrows-h" aria-hidden="true" style="color:orange;cursor:pointer" id="reverseVarSelection"></i> Var2:<select id="selectVar2" style="color:navy"></select></th>'
+        h += '<th id="thVar"><i class="fa fa-clone" aria-hidden="true" style="color:orange;cursor:pointer" id="copyTableToClipboard"></i> Var1:<select id="selectVar1" style="color:green"></select> <i class="fa fa-arrows-h" aria-hidden="true" style="color:orange;cursor:pointer" id="reverseVarSelection"></i> Var2:<select id="selectVar2" style="color:navy"></select></th>'
         h += '<th id="thPlot"><div id="divPlot"></div></th>'
     h += '</tr></thead>'
     h += '<tbody>'
@@ -120,8 +120,17 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
         selectVar1.selectedIndex=s2
         selectVar2.selectedIndex=s1
         selectVar2.onchange()
+    }
 
-        //debugger
+    copyTableToClipboard.onclick=function(){
+        var ta = document.createElement('textarea')
+        ta.value='<table>'+sparcs.table.tbl.innerHTML+'</table>'
+        ta.style.height=ta.style.width=0
+        document.body.appendChild(ta)
+        ta.select()
+        document.execCommand('copy')
+        mathbiol.msg('table copied to clipboard','orange','yellow')
+        setTimeout(_=>{ta.parentElement.removeChild(ta)},2000)
     }
 
     var tdYear = document.createElement('td')
@@ -276,6 +285,7 @@ sparcs.tabCount=function(x){
                     }
                 }
             )
+            mathbiol.msg('plot '+selectVar1.value+' for '+col)
         
         }
         
@@ -324,6 +334,7 @@ sparcs.tabCount=function(x){
                     }
                 }
             )
+            mathbiol.msg('plot '+this.r+' by '+selectVar2.value)
             //plotlyBarChartDiv.innerHTML=''
             //Plotly.newPlot('plotlyBarChartDiv', data);
         }
@@ -364,6 +375,7 @@ sparcs.tabCount=function(x){
             }
 
         })
+        mathbiol.msg('plot '+selectVar1.value+' vs '+selectVar2.value)
         //debugger
     }
 
