@@ -122,6 +122,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
         selectVar2.onchange()
     }
 
+    /* using text are
     copyTableToClipboard.onclick=function(){
         var ta = document.createElement('textarea')
         ta.value='<table>'+sparcs.table.tbl.innerHTML+'</table>'
@@ -131,6 +132,17 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
         document.execCommand('copy')
         mathbiol.msg('table copied to clipboard','orange','yellow')
         setTimeout(_=>{ta.parentElement.removeChild(ta)},2000)
+    }
+    */
+
+    copyTableToClipboard.onclick=function(){  // using rangeTR
+        var sel = window.getSelection()
+        var ra = document.createRange()
+        ra.selectNodeContents(sparcs.table.tbl)
+        sel.removeAllRanges()
+        sel.addRange(ra)
+        document.execCommand('copy')
+        mathbiol.msg('table copied to clipboard','orange')
     }
 
     var tdYear = document.createElement('td')
@@ -205,6 +217,7 @@ sparcs.tabulate=function(){ // tabulate variable selections
     
     sparcs.getJSON(url+q)
      .then(function(x){
+        //debugger
         tdVars.innerHTML=''//'<div id="plotlyBarChartDiv"></div>' //reset
         tdVars.appendChild(sparcs.tabCount(x))
         mathbiol.msg('loading count table ... done')
