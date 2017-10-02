@@ -421,7 +421,10 @@ sparcs.count=function(){
     return JSON.stringify(y,null,3)
 }
 
-
+sparcs.youtube=function(){
+    window.open('https://www.youtube.com/watch?v=k9NM3km9XCY')
+    return 'webcast demo use of the sparcs package opened in new window'
+}
 
 
 
@@ -438,7 +441,7 @@ if(typeof(mathbiol)){
     }
     mathbiol.sparcs.count = sparcs.count
     mathbiol.sparcs.about='New York Statewide Planning and Research Cooperative System (<a href="https://www.health.ny.gov/statistics/sparcs/" target="_blank">SPARCS</a>)'
-   typeCmd=function(that){
+    var typeCmd=function(that){
         mathbiol.sys.cmdSlow(that.textContent+'()')
     }
     mathbiol.sparcs.help=function(){
@@ -447,13 +450,14 @@ if(typeof(mathbiol)){
         h +='<br><b style="color:maroon"> SPARCS Methods</b>:'
         h +='<li><span style="color:yellowgreen;background-color:black;cursor:pointer" onclick="typeCmd(this)">sparcs.count</span> counts patient entries per year</li>'
         h +='<li><span style="color:yellowgreen;background-color:black;cursor:pointer" onclick="typeCmd(this)">sparcs.help</span> the function operated by "help sparcs".</li>'
+        h +='<li><span style="color:yellowgreen;background-color:black;cursor:pointer" onclick="typeCmd(this)">sparcs.youtube</span> opens 10 min screencast in new window.</li>'       
         h +='<li>...</li>'
         setTimeout(function(){
             mathbiol.msg(mathbiol.sparcs.about)
         },200)
         return h
     }
-    mathbiol.sparcs.youtube=""
+    mathbiol.sparcs.youtube=sparcs.youtube
     
 }
 
