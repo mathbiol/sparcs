@@ -448,9 +448,9 @@ if(typeof(mathbiol)){
         var h = 'This command was loaded as part of the <a href="https://github.com/mathbiol/sparcs" target="_blank">"sparcs" module <i class="fa fa-github-alt" aria-hidden="true"></i></a>'
         h +=' developed to analyse the public data of New York Statewide Planning and Research Cooperative System (<a href="https://www.health.ny.gov/statistics/sparcs/" target="_blank">SPARCS</a>).'
         h +='<br><b style="color:maroon"> SPARCS Methods</b>:'
-        h +='<li><span style="color:yellowgreen;background-color:black;cursor:pointer" onclick="typeCmd(this)">sparcs.count</span> counts patient entries per year</li>'
+        h +='<li><span style="color:yellowgreen;background-color:black;cursor:pointer" onclick="typeCmd(this)">sparcs.count</span> counts patient entries per year, same as "count sparcs".</li>'
         h +='<li><span style="color:yellowgreen;background-color:black;cursor:pointer" onclick="typeCmd(this)">sparcs.help</span> the function operated by "help sparcs".</li>'
-        h +='<li><span style="color:yellowgreen;background-color:black;cursor:pointer" onclick="typeCmd(this)">sparcs.youtube</span> opens 10 min screencast in new window.</li>'       
+        h +='<li><span style="color:yellowgreen;background-color:black;cursor:pointer" onclick="typeCmd(this)">sparcs.youtube</span> opens 10 min screencast in new window. Same as "youtube sparcs"</li>'       
         h +='<li>...</li>'
         setTimeout(function(){
             mathbiol.msg(mathbiol.sparcs.about)
