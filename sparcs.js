@@ -104,7 +104,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     h += '<thead><tr>'
         h += '<th>Year</th>'
         h += '<th>County</th>'
-        h += '<th id="thVar"><i class="fa fa-clone" aria-hidden="true" style="color:orange;cursor:pointer" id="copyTableToClipboard"></i> Var1:<select id="selectVar1" style="color:green"></select> <i class="fa fa-arrows-h" aria-hidden="true" style="color:orange;cursor:pointer" id="reverseVarSelection"></i> Var2:<select id="selectVar2" style="color:navy"></select></th>'
+        h += '<th id="thVar"><i class="fa fa-clone" aria-hidden="true" style="color:orange;cursor:pointer" id="copyTableToClipboard"></i> <input id="constrainRows" style="color:silver" value=" query rows, i.e. cancer"> Var1:<select id="selectVar1" style="color:green"></select> <i class="fa fa-arrows-h" aria-hidden="true" style="color:orange;cursor:pointer" id="reverseVarSelection"></i> Var2:<select id="selectVar2" style="color:navy"></select></th>'
         h += '<th id="thPlot"><div id="divPlot"></div></th>'
     h += '</tr></thead>'
     h += '<tbody>'
@@ -120,6 +120,24 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
         selectVar1.selectedIndex=s2
         selectVar2.selectedIndex=s1
         selectVar2.onchange()
+    }
+
+    constrainRows.onkeyup=function(evt){
+        var q = this.value.toLowerCase()
+        sparcs.table.trs.forEach(function(tr){
+            if($('th',tr)[0].textContent.toLowerCase().match(q)){
+                tr.hidden=false
+            }else{
+                tr.hidden=true
+            }
+        })
+    }
+    constrainRows.onclick=function(){
+        if(this.style.color=="silver"){
+            this.style.color="green"
+            this.value=""
+        }
+        //debugger
     }
 
     /* using text are
@@ -305,9 +323,11 @@ sparcs.tabCount=function(x){
     })
     var tbd = document.createElement('tbody') // body of the counts table
     tb.appendChild(tbd)
+    sparcs.table.trs=[]
     rowVals.forEach(function(r,i){
         sparcs.table.tds[i]=[]
         var tr = document.createElement('tr')
+        sparcs.table.trs[i]=tr
         tbd.appendChild(tr)
         var th = document.createElement('th') // row label
         tr.appendChild(th)
