@@ -397,6 +397,13 @@ sparcs.tabCount=function(x){
                 type:'bar'
             }
         })
+
+        traces=traces.filter(function(tc,i){ // hide hidden traces
+            return !sparcs.table.trs[i].hidden
+        })
+
+        //debugger
+
         cmdSide.innerHTML='<div id="plotlyBarChartDiv"></div>'
         sparcs.clicked=this
         Plotly.newPlot('plotlyBarChartDiv',traces,{
