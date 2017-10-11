@@ -104,6 +104,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     h += '<thead><tr>'
         h += '<th>Year</th>'
         h += '<th>County</th>'
+        //h += '<th id="thVar"><i class="fa fa-clone" aria-hidden="true" style="color:orange;cursor:pointer" id="copyTableToClipboard"></i> <input id="constrainRows" style="color:silver" value=" query rows, i.e. cancer"> Var1:<select id="selectVar1" style="color:green"></select> <i class="fa fa-arrows-h" aria-hidden="true" style="color:orange;cursor:pointer" id="reverseVarSelection"></i> Var2:<select id="selectVar2" style="color:navy"></select><input id="constrainCols" style="color:silver" value=" query columns, i.e. island"></th>'
         h += '<th id="thVar"><i class="fa fa-clone" aria-hidden="true" style="color:orange;cursor:pointer" id="copyTableToClipboard"></i> <input id="constrainRows" style="color:silver" value=" query rows, i.e. cancer"> Var1:<select id="selectVar1" style="color:green"></select> <i class="fa fa-arrows-h" aria-hidden="true" style="color:orange;cursor:pointer" id="reverseVarSelection"></i> Var2:<select id="selectVar2" style="color:navy"></select></th>'
         h += '<th id="thPlot"><div id="divPlot"></div></th>'
     h += '</tr></thead>'
@@ -126,7 +127,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     constrainRows.onkeyup=function(evt){
         var q = this.value.toLowerCase()
         sparcs.table.trs.forEach(function(tr){
-            if($('th',tr)[0].textContent.toLowerCase().match(q)){
+            if($('th',tr)[0].textContent.toLowerCase().match((new RegExp(q)))){
                 tr.hidden=false
             }else{
                 tr.hidden=true
@@ -140,6 +141,26 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
         }
         //debugger
     }
+
+    /*
+    constrainCols.onkeyup=function(evt){
+        var q = this.value.toLowerCase()
+        sparcs.table.trs.forEach(function(tr){
+            if($('th',tr)[0].textContent.toLowerCase().match((new RegExp(q)))){
+                tr.hidden=false
+            }else{
+                tr.hidden=true
+            }
+        })
+    }
+    constrainCols.onclick=function(){
+        if(this.style.color=="silver"){
+            this.style.color="navy"
+            this.value=""
+        }
+        //debugger
+    }
+    */
 
     /* using text are
     copyTableToClipboard.onclick=function(){
@@ -228,6 +249,9 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
         mathbiol.msg('loading count table ...','red')
         sparcs.tabulate()
     }
+
+    // reactive adjustments
+    cmd.onmouseup=cmd.onmouseleave=function(){cmdMsgPre.style.width=cmd.style.width}
 }
 
 sparcs.tabulate=function(){ // tabulate variable selections
@@ -466,7 +490,6 @@ sparcs()
 
 if(typeof(mathbiol)){
 
-    mathbiol.andrejs=function(x){alert('Andrejs says "'+x+'"')}
     mathbiol.sparcs=function(cmd){
         if(!cmd){
             return '"sparcs" command is under development, do "help sparcs" for more'
