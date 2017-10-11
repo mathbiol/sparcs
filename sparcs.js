@@ -119,6 +119,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
         var s2 = selectVar2.selectedIndex
         selectVar1.selectedIndex=s2
         selectVar2.selectedIndex=s1
+        constrainRows.style.color="silver" // later replace by switching search boxes too
         selectVar2.onchange()
     }
 
@@ -424,6 +425,11 @@ sparcs.tabCount=function(x){
 }
 
 sparcs.clickAgain=function(){
+    // start by refreshing table hides
+    if((constrainRows.style.color!=='silver')&&(constrainRows.value.length>0)){
+        constrainRows.onkeyup()
+    }
+    
     if(sparcs.clicked){
         if(sparcs.clicked.id==="cornerth0"){
             sparcs.clicked.click()
