@@ -104,8 +104,8 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     h += '<thead><tr>'
         h += '<th>Year</th>'
         h += '<th>County</th>'
-        //h += '<th id="thVar"><i class="fa fa-clone" aria-hidden="true" style="color:orange;cursor:pointer" id="copyTableToClipboard"></i> <input id="constrainRows" style="color:silver" value=" query rows, i.e. cancer"> Var1:<select id="selectVar1" style="color:green"></select> <i class="fa fa-arrows-h" aria-hidden="true" style="color:orange;cursor:pointer" id="reverseVarSelection"></i> Var2:<select id="selectVar2" style="color:navy"></select><input id="constrainCols" style="color:silver" value=" query columns, i.e. island"></th>'
-        h += '<th id="thVar"><i class="fa fa-clone" aria-hidden="true" style="color:orange;cursor:pointer" id="copyTableToClipboard"></i> <input id="constrainRows" style="color:silver" value=" query rows, i.e. cancer"> Var1:<select id="selectVar1" style="color:green"></select> <i class="fa fa-arrows-h" aria-hidden="true" style="color:orange;cursor:pointer" id="reverseVarSelection"></i> Var2:<select id="selectVar2" style="color:navy"></select></th>'
+        h += '<th id="thVar"><i class="fa fa-clone" aria-hidden="true" style="color:orange;cursor:pointer" id="copyTableToClipboard"></i> <input id="constrainRows" style="color:silver" value=" query rows, i.e. cancer"> Var1:<select id="selectVar1" style="color:green"></select> <i class="fa fa-arrows-h" aria-hidden="true" style="color:orange;cursor:pointer" id="reverseVarSelection"></i> Var2:<select id="selectVar2" style="color:navy"></select><input id="constrainCols" style="color:silver" value=" query cols, i.e. south"></th>'
+        //h += '<th id="thVar"><i class="fa fa-clone" aria-hidden="true" style="color:orange;cursor:pointer" id="copyTableToClipboard"></i> <input id="constrainRows" style="color:silver" value=" query rows, i.e. cancer"> Var1:<select id="selectVar1" style="color:green"></select> <i class="fa fa-arrows-h" aria-hidden="true" style="color:orange;cursor:pointer" id="reverseVarSelection"></i> Var2:<select id="selectVar2" style="color:navy"></select></th>'
         h += '<th id="thPlot"><div id="divPlot"></div></th>'
     h += '</tr></thead>'
     h += '<tbody>'
@@ -120,8 +120,25 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
         var s2 = selectVar2.selectedIndex
         selectVar1.selectedIndex=s2
         selectVar2.selectedIndex=s1
-        constrainRows.style.color="silver" // later replace by switching search boxes too
+        //constrainRows.style.color=constrainCols.style.color="silver" // later replace by switching search boxes too
+        var vr = constrainRows.value
+        var vc = constrainCols.value
         selectVar2.onchange()
+        var cr = constrainRows.style.color
+        var cc = constrainCols.style.color
+        if(constrainCols.style.color!=="silver"){
+            constrainRows.value=vc
+            constrainRows.style.color="green"
+            if(cr=="silver"){constrainCols.style.color='silver'}
+            constrainRows.onkeyup()
+        }
+        if(constrainRows.style.color!=="silver"){
+            constrainCols.value=vr
+            constrainCols.style.color="navy"
+            if(cc=="silver"){constrainRows.style.color='silver'}
+            constrainCols.onkeyup()
+        }
+        if(cr=="silver"){constrainRows.style.color}
     }
 
     constrainRows.onkeyup=function(evt){
@@ -146,39 +163,46 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
         //debugger
     }
 
-    /*
+    
     constrainCols.onkeyup=function(evt){
         var q = this.value.toLowerCase()
-        sparcs.table.trs.forEach(function(tr){
-            if($('th',tr)[0].textContent.toLowerCase().match((new RegExp(q)))){
-                tr.hidden=false
-            }else{
-                tr.hidden=true
+        var ii = [] 
+        sparcs.table.colVals.forEach(function(v,i){
+            if(v.toLowerCase().match(new RegExp(q))){
+                ii.push(i)
             }
         })
+        // hide ii columns
+        sparcs.table.tds.forEach(function(tds){
+            tds.forEach(function(td,i){
+                if(ii.indexOf(i)>=0){
+                    td.hidden=false
+                }else{
+                    td.hidden=true
+                }
+            })
+        })
+        for(var i=0;i<sparcs.table.tds[0].length;i++){
+            if(ii.indexOf(i)>=0){
+                sparcs.table.tbl.tHead.children[i+1].hidden=false
+            }else{
+                sparcs.table.tbl.tHead.children[i+1].hidden=true
+            }
+        }
+        sparcs.table.hideOtherCols=ii
     }
     constrainCols.onclick=function(){
         if(this.style.color=="silver"){
             this.style.color="navy"
-            this.value=""
+            if(this.value==" query cols, i.e. south"){
+                this.value=""
+            }else{
+                constrainCols.onkeyup()
+            }
         }
         //debugger
     }
-    */
-
-    /* using text are
-    copyTableToClipboard.onclick=function(){
-        var ta = document.createElement('textarea')
-        ta.value='<table>'+sparcs.table.tbl.innerHTML+'</table>'
-        ta.style.height=ta.style.width=0
-        document.body.appendChild(ta)
-        ta.select()
-        document.execCommand('copy')
-        mathbiol.msg('table copied to clipboard','orange','yellow')
-        setTimeout(_=>{ta.parentElement.removeChild(ta)},2000)
-    }
-    */
-
+    
     copyTableToClipboard.onclick=function(){  // using rangeTR
         var sel = window.getSelection()
         var ra = document.createRange()
@@ -292,6 +316,20 @@ sparcs.toArray=function(obj){
     return y
 }
 
+sparcs.hideOtherCols=function(x){
+    //debugger
+    if(sparcs.table.hideOtherCols){
+        x=x.filter(function(xi,i){
+            if(sparcs.table.hideOtherCols.indexOf(i)>=0){
+                return true
+            }else{
+                return false
+            }
+        })
+    }
+    return x
+}
+
 sparcs.tabCount=function(x){
     var tb = document.createElement('table')
     tb.border=true
@@ -329,10 +367,10 @@ sparcs.tabCount=function(x){
             Plotly.newPlot('plotlyBarChartDiv',
                 [
                   {
-                    x: sparcs.table.tds.map(function(td){
+                    x: sparcs.hideOtherCols(sparcs.table.tds.map(function(td){
                         return parseInt(td[i].textContent)
-                    }),
-                    y: sparcs.table.rowVals,
+                    })),
+                    y: sparcs.hideOtherCols(sparcs.hideOtherCols(sparcs.table.rowVals)),
                     orientation: 'h',
                     type: 'bar'
                   }
@@ -383,8 +421,8 @@ sparcs.tabCount=function(x){
             Plotly.newPlot('plotlyBarChartDiv',
                 [
                   {
-                    x: sparcs.table.colVals,
-                    y: y,
+                    x: sparcs.hideOtherCols(sparcs.table.colVals),
+                    y: sparcs.hideOtherCols(y),
                     type: 'bar'
                   }
                 ],
@@ -420,8 +458,8 @@ sparcs.tabCount=function(x){
     th0.onclick=function(){
         var traces = sparcs.table.rowVals.map(function(r,i){
             return {
-                x:sparcs.table.colVals,
-                y:sparcs.table.tds[i].map(function(td){return parseInt(td.textContent)}),
+                x:sparcs.hideOtherCols(sparcs.table.colVals),
+                y:sparcs.hideOtherCols(sparcs.table.tds[i].map(function(td){return parseInt(td.textContent)})),
                 name:r,
                 type:'bar'
             }
@@ -456,6 +494,9 @@ sparcs.clickAgain=function(){
     // start by refreshing table hides
     if((constrainRows.style.color!=='silver')&&(constrainRows.value.length>0)){
         constrainRows.onkeyup()
+    }
+    if((constrainCols.style.color!=='silver')&&(constrainCols.value.length>0)){
+        constrainCols.onkeyup()
     }
     
     if(sparcs.clicked){
