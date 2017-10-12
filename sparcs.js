@@ -137,7 +137,11 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     constrainRows.onclick=function(){
         if(this.style.color=="silver"){
             this.style.color="green"
-            this.value=""
+            if(this.value==" query rows, i.e. cancer"){
+                this.value=""
+            }else{
+                constrainRows.onkeyup()
+            }
         }
         //debugger
     }
