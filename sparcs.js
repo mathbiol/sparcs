@@ -120,25 +120,21 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
         var s2 = selectVar2.selectedIndex
         selectVar1.selectedIndex=s2
         selectVar2.selectedIndex=s1
-        //constrainRows.style.color=constrainCols.style.color="silver" // later replace by switching search boxes too
+        if(constrainRows.style.color=="silver"){
+            constrainCols.value=''
+            constrainRows.style.color='green'
+        }
+        if(constrainCols.style.color=="silver"){
+            constrainCols.value=''
+            constrainCols.style.color='navy'
+        }
         var vr = constrainRows.value
         var vc = constrainCols.value
+        constrainRows.value=vc
+        constrainCols.value=vr
         selectVar2.onchange()
-        var cr = constrainRows.style.color
-        var cc = constrainCols.style.color
-        if(constrainCols.style.color!=="silver"){
-            constrainRows.value=vc
-            constrainRows.style.color="green"
-            if(cr=="silver"){constrainCols.style.color='silver'}
-            constrainRows.onkeyup()
-        }
-        if(constrainRows.style.color!=="silver"){
-            constrainCols.value=vr
-            constrainCols.style.color="navy"
-            if(cc=="silver"){constrainRows.style.color='silver'}
-            constrainCols.onkeyup()
-        }
-        if(cr=="silver"){constrainRows.style.color}
+        constrainRows.onkeyup()
+        constrainRows.onkeyup()
     }
 
     constrainRows.onkeyup=function(evt){
