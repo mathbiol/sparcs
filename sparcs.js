@@ -520,7 +520,7 @@ sparcs.count=function(){
 }
 
 sparcs.youtube=function(){
-    window.open('https://www.youtube.com/watch?v=k9NM3km9XCY')
+    window.open('https://www.youtube.com/watch?v=NZkJeT6R_H4')
     return 'webcast demo use of the sparcs package opened in new window'
 }
 
