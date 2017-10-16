@@ -8,7 +8,7 @@ sparcs = function(){
         let h = '<p><b style="color:maroon;font-size:large">SPARCS</b>: New York Statewide Planning and Research Cooperative System (<a href="https://www.health.ny.gov/statistics/sparcs/" target="_blank">SPARCS</a>) Inpatient De-Identified dataset </p>'
         //cmdSide.innerHTML +='<h4 id="sparcsCountyHead"><span id="sparcsCounty">Suffolk</span></h4>'
         h+= '<ol id="sparcsYearsInfo"></ol>'
-        h+= '<p>For more information type <span id="typeHelpSparcs" style="background-color:black;color:yellowgreen;cursor:pointer">&nbsp;help sparcs&nbsp;</span> (or click on me).<br> For a 10 min demo have a look at this <a href="https://www.youtube.com/watch?v=k9NM3km9XCY" target="_blank" style="background-color:red;color:white">&nbsp;YouTube video </a>.</p>'
+        h+= '<p>For more information type <span id="typeHelpSparcs" style="background-color:black;color:yellowgreen;cursor:pointer">&nbsp;help sparcs&nbsp;</span> (or click on me).<br> For a 10 min demo have a look at this <a href="https://www.youtube.com/watch?v=NZkJeT6R_H4" target="_blank" style="background-color:red;color:white">&nbsp;YouTube video </a>.</p>'
         cmdSide.innerHTML=h
         sparcs.countCounty().then(_=>sparcs.rangeUI())
         typeHelpSparcs.onclick=function(){
