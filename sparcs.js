@@ -80,7 +80,7 @@ sparcs.countCounty=function(){
         var url = sparcs.urls[yr].url
         // https://dev.socrata.com/docs/queries/
         // https://dev.socrata.com/docs/functions
-        pp.push(sparcs.getJSON(url+'?$select=hospital_county,%20count(*)&$group=hospital_county')
+        pp.push(sparcs.getJSON(url+'?$select=hospital_county,%20count(*)&$group=hospital_county&$limit=10000')
          .then(function(x){
             sparcs.urls[yr].count=0
             x.forEach(function(xi){
@@ -280,7 +280,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
 
 sparcs.tabulate=function(){ // tabulate variable selections
     var url = sparcs.urls[yearSelect.value].url+'.json'
-    var q = '?$SELECT='+selectVar1.value+', '+selectVar2.value+', COUNT(*) as count&$group='+selectVar1.value+', '+selectVar2.value+'&$where=hospital_county="'+countySelect.value+'"'
+    var q = '?$SELECT='+selectVar1.value+', '+selectVar2.value+', COUNT(*) as count&$group='+selectVar1.value+', '+selectVar2.value+'&$where=hospital_county="'+countySelect.value+'"&$limit=10000'
     
     sparcs.getJSON(url+q)
      .then(function(x){
