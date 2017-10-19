@@ -96,6 +96,12 @@ sparcs.countCounty=function(){
     //console.log(pp)
     return Promise.all(pp)
 }
+sparcs.match=function(patt,q){
+    q='('+q.replace(/\s*\,\s*/g,')|(')+')'
+    q=q.replace('|()','')
+    //console.log(patt,q)
+    return patt.match(new RegExp(q,'i'))    
+}
 
 sparcs.rangeUI=function(div){ // assemple UI with ranges
     div=div||cmdResults // default div with id cmdResults
@@ -138,9 +144,10 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     }
 
     constrainRows.onkeyup=function(evt){
-        var q = this.value.toLowerCase()
+        var q = this.value//.toLowerCase()
         sparcs.table.trs.forEach(function(tr){
-            if($('th',tr)[0].textContent.toLowerCase().match((new RegExp(q)))){
+            //if($('th',tr)[0].textContent.match((new RegExp(q,'i')))){
+            if(sparcs.match($('th',tr)[0].textContent,q)){
                 tr.hidden=false
             }else{
                 tr.hidden=true
@@ -161,10 +168,11 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
 
     
     constrainCols.onkeyup=function(evt){
-        var q = this.value.toLowerCase()
+        var q = this.value
         var ii = [] 
         sparcs.table.colVals.forEach(function(v,i){
-            if(v.toLowerCase().match(new RegExp(q))){
+            if(sparcs.match(v,q)){
+            //if(v.toLowerCase().match(new RegExp(q))){
                 ii.push(i)
             }
         })
