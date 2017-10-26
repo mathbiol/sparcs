@@ -110,7 +110,10 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     h += '<thead><tr>'
         h += '<th>Year</th>'
         h += '<th>County</th>'
-        h += '<th id="thVar"><i class="fa fa-clone" aria-hidden="true" style="color:orange;cursor:pointer" id="copyTableToClipboard"></i> <input id="constrainRows" style="color:silver" value=" query rows, i.e. cancer"> Var1:<select id="selectVar1" style="color:green"></select> <i class="fa fa-arrows-h" aria-hidden="true" style="color:orange;cursor:pointer" id="reverseVarSelection"></i> Var2:<select id="selectVar2" style="color:navy"></select><input id="constrainCols" style="color:silver" value=" query cols, i.e. south"></th>'
+        h += '<th id="thVar">'
+        h += '<i class="fa fa-clone" aria-hidden="true" style="color:orange;cursor:pointer" id="copyTableToClipboard"></i> <input id="constrainRows" style="color:silver" value=" query rows, i.e. cancer"> Var1:<select id="selectVar1" style="color:green"></select> <i class="fa fa-arrows-h" aria-hidden="true" style="color:orange;cursor:pointer" id="reverseVarSelection"></i> Var2:<select id="selectVar2" style="color:navy"></select><input id="constrainCols" style="color:silver" value=" query cols, i.e. south"> <span id="filterMore" style="color:blue;cursor:pointer"><i class="fa fa-plus-circle" aria-hidden="true"></i> filter</span>'
+        h += '<div id="filterMoreDiv" hidden=true>Additional filter: <input id="filterInput" size=80 style="color:silver"></div>'
+        h += '</th>'
         //h += '<th id="thVar"><i class="fa fa-clone" aria-hidden="true" style="color:orange;cursor:pointer" id="copyTableToClipboard"></i> <input id="constrainRows" style="color:silver" value=" query rows, i.e. cancer"> Var1:<select id="selectVar1" style="color:green"></select> <i class="fa fa-arrows-h" aria-hidden="true" style="color:orange;cursor:pointer" id="reverseVarSelection"></i> Var2:<select id="selectVar2" style="color:navy"></select></th>'
         h += '<th id="thPlot"><div id="divPlot"></div></th>'
     h += '</tr></thead>'
@@ -119,6 +122,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     h += '<tbody>'
     h += '</table>'
     div.innerHTML=h
+    filterInput.value='zip_code_3_digits="117" OR zip_code_3_digits="119"'
     // years
 
     reverseVarSelection.onclick=function(){
@@ -131,7 +135,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
             constrainRows.style.color='green'
         }
         if(constrainCols.style.color=="silver"){
-            constrainCols.value=''
+            constrainRows.value=''
             constrainCols.style.color='navy'
         }
         var vr = constrainRows.value
@@ -153,6 +157,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
                 tr.hidden=true
             }
         })
+        //sparcs.clickAgain()
     }
     constrainRows.onclick=function(){
         if(this.style.color=="silver"){
@@ -194,6 +199,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
             }
         }
         sparcs.table.hideOtherCols=ii
+        //sparcs.clickAgain()
     }
     constrainCols.onclick=function(){
         if(this.style.color=="silver"){
@@ -215,6 +221,35 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
         sel.addRange(ra)
         document.execCommand('copy')
         mathbiol.msg('table copied to clipboard','orange')
+    }
+
+    filterMore.onclick=function(){
+        if(filterMoreDiv.hidden){
+            filterMoreDiv.hidden=false
+            filterMore.innerHTML='<i class="fa fa-minus-circle" aria-hidden="true"></i> remove filter'
+            filterMore.style.color='maroon'
+            if(filterInput.style.color!=='silver'){
+                sparcs.tabulate()
+            }
+        }else{
+            filterMoreDiv.hidden=true
+            filterMore.innerHTML='<i class="fa fa-plus-circle" aria-hidden="true"></i> filter'
+            filterMore.style.color='blue'
+            sparcs.tabulate()
+
+        }
+            
+        //debugger
+    }
+
+    filterInput.onclick=function(){
+        this.style.fontSize="13px"
+        this.style.color="blue"
+    }
+    filterInput.onkeyup=function(ev){
+        if(ev.keyCode==13){
+            sparcs.tabulate()
+        }
     }
 
     var tdYear = document.createElement('td')
@@ -282,6 +317,17 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
         sparcs.tabulate()
     }
 
+    // filter more
+    /*
+    sparcs.vars.forEach(function(v){
+        var op=document.createElement('option')
+        op.value=op.textContent=v
+        filterParm.appendChild(op)
+    })
+    filterMoreDiv.appendChild(filterParm)
+    */
+
+
     // reactive adjustments
     cmd.onmouseup=cmd.onmouseleave=function(){cmdMsgPre.style.width=cmd.style.width}
 }
@@ -289,7 +335,10 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
 sparcs.tabulate=function(){ // tabulate variable selections
     var url = sparcs.urls[yearSelect.value].url+'.json'
     var q = '?$SELECT='+selectVar1.value+', '+selectVar2.value+', COUNT(*) as count&$group='+selectVar1.value+', '+selectVar2.value+'&$where=hospital_county="'+countySelect.value+'"&$limit=10000'
-    
+    if((!filterMoreDiv.hidden)&&(filterInput.style.color!=='silver')&&(filterInput.value.length>5)){
+        q = '?$SELECT='+selectVar1.value+', '+selectVar2.value+', COUNT(*) as count&$group='+selectVar1.value+', '+selectVar2.value+'&$where=hospital_county="'+countySelect.value+'" AND ('+filterInput.value+')&$limit=10000'
+        console.log('filtered query:',url+q)
+    }
     sparcs.getJSON(url+q)
      .then(function(x){
         //debugger
@@ -368,6 +417,10 @@ sparcs.tabCount=function(x){
             var col=this.textContent
             var i = sparcs.table.colVals.indexOf(this.textContent)
             sparcs.clicked=this
+            var title = selectVar1.value+' for '+col+' ('+countySelect.value+' '+yearSelect.value+')'
+            if((!filterMoreDiv.hidden)&&(filterInput.style.color!=='silver')){
+                title += '<br><span style="font-size:small"> where '+filterInput.value+'</span>'
+            }
             Plotly.newPlot('plotlyBarChartDiv',
                 [
                   {
@@ -381,7 +434,7 @@ sparcs.tabCount=function(x){
                 ],
                 {
                     height:cmd.clientHeight+50,
-                    title:selectVar1.value+' for '+col+' ('+countySelect.value+' '+yearSelect.value+')',
+                    title:title,
                     xaxis: {
                         title: 'patient count'
                     }
@@ -422,6 +475,10 @@ sparcs.tabCount=function(x){
             // assemble plot
             cmdSide.innerHTML='<div id="plotlyBarChartDiv"></div>'
             sparcs.clicked=this
+            var title = this.r+' by '+selectVar2.value+' ('+countySelect.value+' '+yearSelect.value+')'
+            if((!filterMoreDiv.hidden)&&(filterInput.style.color!=='silver')){
+                title += '<br><span style="font-size:small"> where '+filterInput.value+'</span>'
+            }
             Plotly.newPlot('plotlyBarChartDiv',
                 [
                   {
@@ -432,7 +489,7 @@ sparcs.tabCount=function(x){
                 ],
                 {
                     height:cmd.clientHeight+50,
-                    title:this.r+' by '+selectVar2.value+' ('+countySelect.value+' '+yearSelect.value+')',
+                    title:title,
                     yaxis: {
                         title: 'patient count'
                     }
@@ -477,10 +534,14 @@ sparcs.tabCount=function(x){
 
         cmdSide.innerHTML='<div id="plotlyBarChartDiv"></div>'
         sparcs.clicked=this
+        var title = selectVar1.value+' vs '+selectVar2.value+' ('+countySelect.value+' '+yearSelect.value+')'
+        if((!filterMoreDiv.hidden)&&(filterInput.style.color!=='silver')){
+            title += '<br><span style="font-size:small"> where '+filterInput.value+'</span>'
+        }
         Plotly.newPlot('plotlyBarChartDiv',traces,{
             barmode:'stack',
             height:cmd.clientHeight+50,
-            title:selectVar1.value+' vs '+selectVar2.value+' ('+countySelect.value+' '+yearSelect.value+')',
+            title:title,
             yaxis: {
                 title: 'patient count'
             }
@@ -565,5 +626,3 @@ if(typeof(mathbiol)){
     mathbiol.sparcs.youtube=sparcs.youtube
     
 }
-
-
