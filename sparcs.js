@@ -445,10 +445,17 @@ sparcs.tabCount=function(x){
             Plotly.newPlot('plotlyBarChartDiv',
                 [
                   {
-                    x: sparcs.hideOtherCols(sparcs.table.tds.map(function(td){
-                        return parseInt(td[i].textContent)
-                    })),
-                    y: sparcs.hideOtherCols(sparcs.hideOtherCols(sparcs.table.rowVals)),
+                    x: sparcs.hideOtherCols(sparcs.table.tds
+                        .map(function(td){
+                            return parseInt(td[i].textContent)
+                        }).filter(function(vals,r){
+                            return !sparcs.table.trs[r].hidden
+                        })
+                      ),
+                    y: sparcs.hideOtherCols(sparcs.hideOtherCols(sparcs.table.rowVals))
+                       .filter(function(vals,r){
+                            return !sparcs.table.trs[r].hidden
+                        }),
                     orientation: 'h',
                     type: 'bar'
                   }
