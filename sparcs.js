@@ -139,6 +139,14 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     // years
 
     reverseVarSelection.onclick=function(){
+        if(constrainCols.style.color=="silver"){
+            constrainCols.value=''
+            constrainCols.style.color='navy'
+        }
+        if(constrainRows.style.color=="silver"){
+            constrainRows.value=''
+            constrainRows.style.color='green'
+        }
         var s1 = selectVar1.selectedIndex
         var s2 = selectVar2.selectedIndex
         selectVar1.selectedIndex=s2
