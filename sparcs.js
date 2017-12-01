@@ -30,17 +30,29 @@ sparcs.urls={
 sparcs.years=Object.getOwnPropertyNames(sparcs.urls)
 
 sparcs.getJSON=function(url){
+    if(url.match('n5y9-zanf')){ // fixing 2011 data structure
+        url = url.replace(/age_group/g,'age')
+    }
+    function fix2011(x){
+        if(url.match('n5y9-zanf')){ // fix misslabeling of .age_group and .age
+            x=x.map(function(xi){
+                xi.age_group=xi.age
+                return xi
+            })
+        }
+        return x
+    }
     return new Promise(function(resolve, reject) {
       // do a thing, possibly async, then…
       localforage.getItem(url)
         .then(function(x){
             if(x){
-                resolve(x)
+                resolve(fix2011(x))
             }else{
                 $.getJSON(url)
                  .then(function(x){
                   localforage.setItem(url,x)
-                  resolve(x)
+                  resolve(fix2011(x))
                 })
                  .fail(function(err){reject(err)})
             }})
