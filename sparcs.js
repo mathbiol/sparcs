@@ -14,6 +14,7 @@ sparcs = function(){
         typeHelpSparcs.onclick=function(){
             mathbiol.sys.cmdSlow('help sparcs')
         }
+        sparcs.zip3() // load zip shapes
     }
 }
 
@@ -442,32 +443,52 @@ sparcs.tabCount=function(x){
             if((!filterMoreDiv.hidden)&&(filterInput.style.color!=='silver')){
                 title += '<br><span style="font-size:small"> where '+filterInput.value+'</span>'
             }
-            Plotly.newPlot('plotlyBarChartDiv',
-                [
-                  {
-                    x: sparcs.hideOtherCols(sparcs.table.tds
-                        .map(function(td){
-                            return parseInt(td[i].textContent)
-                        }).filter(function(vals,r){
-                            return !sparcs.table.trs[r].hidden
-                        })
-                      ),
-                    y: sparcs.hideOtherCols(sparcs.hideOtherCols(sparcs.table.rowVals))
-                       .filter(function(vals,r){
-                            return !sparcs.table.trs[r].hidden
-                        }),
-                    orientation: 'h',
-                    type: 'bar'
-                  }
-                ],
-                {
-                    height:cmd.clientHeight+50,
-                    title:title,
-                    xaxis: {
-                        title: 'patient count'
+
+            if(selectVar1.value!=="zip_code_3_digits"){
+                Plotly.newPlot('plotlyBarChartDiv',
+                    [
+                      {
+                        x: sparcs.hideOtherCols(sparcs.table.tds
+                            .map(function(td){
+                                return parseInt(td[i].textContent)
+                            }).filter(function(vals,r){
+                                return !sparcs.table.trs[r].hidden
+                            })
+                          ),
+                        y: sparcs.hideOtherCols(sparcs.hideOtherCols(sparcs.table.rowVals))
+                           .filter(function(vals,r){
+                                return !sparcs.table.trs[r].hidden
+                            }),
+                        orientation: 'h',
+                        type: 'bar'
+                      }
+                    ],
+                    {
+                        height:cmd.clientHeight+50,
+                        title:title,
+                        xaxis: {
+                            title: 'patient count'
+                        }
                     }
+                )
+            }else{ // plot choropleth because rwos are 3-digit zip codes
+                if(!sparcs.map){
+                    $.getScript('https://maps.googleapis.com/maps/api/js?key=AIzaSyBujrQMOlux6Rgmx9DTPhQGetcyTZZbXbs&callback=sparcs.initMap');
+                }else{
+                    sparcs.initMap()
                 }
-            )
+                
+                /*
+                Plotly.newPlot('plotlyBarChartDiv',
+                    [{
+                        type: 'choropleth'
+                    }],
+                    {}
+                  )
+                */
+                //debugger
+            }
+                
             mathbiol.msg('plot '+selectVar1.value+' for '+col)
         
         }
@@ -619,6 +640,105 @@ sparcs.count=function(){
 sparcs.youtube=function(){
     window.open('https://www.youtube.com/watch?v=NZkJeT6R_H4')
     return 'webcast demo use of the sparcs package opened in new window'
+}
+
+sparcs.zip3=function(){
+    console.log('loading 3-digit zip code shape files ...')
+    sparcs.getJSON('/sparcs/zip3.geojson')
+      .then(function(x){
+          sparcs.zip3.geometry={}
+          x.features.forEach(function(xi){
+              if(!sparcs.zip3.geometry[xi.properties.ZIP]){
+                  sparcs.zip3.geometry[xi.properties.ZIP]={coordinates:[]}
+              }
+              sparcs.zip3.geometry[xi.properties.ZIP].coordinates=sparcs.zip3.geometry[xi.properties.ZIP].coordinates.concat(xi.geometry.coordinates)
+              //debugger
+
+          })
+          
+          y=x;console.log('... shapes loaded')
+       })
+}
+
+sparcs.initMap=function(){
+    // set default map center as Suffolk county map center
+    var current_center = {lat: 40.9332373, lng: -72.7924525};
+    var current_zoom =8;
+    plotlyBarChartDiv.style.height=cmd.clientHeight+50
+    sparcs.map=new google.maps.Map(document.getElementById('plotlyBarChartDiv'),{
+        // set default center as in Suffolk county :
+        //center: {lat: 40.9332373, lng: -72.7924525},
+        center: current_center,
+        scrollwheel: false,
+        zoom: current_zoom
+    });
+    console.log('clicked:',sparcs.clicked)
+    
+    // extract vizible data
+    var ind = []
+    var v1 = [] // zip code values as variable 1
+    sparcs.table.trs.forEach(function(tr,i){
+        if(!tr.hidden){
+            let v = $('th',tr)[0].textContent || "undefined"
+            if(v.match(/^\d+$/)){ // only numbers
+                v1.push(v)
+                ind.push(i)
+            }
+            
+        }
+    })
+    var j = sparcs.table.colVals.indexOf(sparcs.clicked.textContent)
+    // counts for variable 2, the jth column
+    var v2 = ind.map(function(i){
+        return parseInt(sparcs.table.tds[i][j].textContent)
+    })
+    var v2max=v2.reduce(function(a,b){if(b>a){return b}else{return a}})
+    var v2norm=v2.map(function(v){return v/v2max})
+    // ready for polygons
+    sparcs.polygons={}
+    var polygons=v1.map(function(v,zi){
+        console.log('zip3=',v)
+        sparcs.polygons[v]=[] // v = zip3
+        console.log(v,sparcs.zip3.geometry[v])
+        sparcs.zip3.geometry[v].coordinates.forEach(function(g,i){
+            // get the individual polygon 
+            var poly=g.map(function(gi){
+                return {lat:gi[1],lng:gi[0]}
+            })
+            // plot ith polygon for v zip3
+            sparcs.polygons[v][i]=new google.maps.Polygon({
+                paths: poly,
+                fillColor:sparcs.color(v2norm[zi])
+            })
+            sparcs.polygons[v][i].setMap(sparcs.map)
+            //console.log(v,JSON.stringify(poly))
+
+            
+
+            4
+
+        })
+        4
+    })
+
+
+    //debugger
+}
+
+sparcs.cPdf=function(x,u,s){
+    u=u||0;
+    s=s||1;
+    return Math.round(255*(1/(s*Math.sqrt(2*Math.PI)))*(Math.exp((-Math.pow((x-u),2))/(2*Math.pow(s,2))))/(1/(s*Math.sqrt(2*Math.PI))))
+}
+
+sparcs.color=function(val){
+    if(Array.isArray(val)){
+        return val.map(function(v){
+            return sparcs.color(v)
+        })
+    }else{val = val*255
+        return 'rgb('+sparcs.cPdf(val,255,35)+','+sparcs.cPdf(val,0,35) +','+sparcs.cPdf(val,100,35)+')'
+    }
 }
 
 
