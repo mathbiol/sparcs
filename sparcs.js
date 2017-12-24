@@ -662,15 +662,20 @@ sparcs.zip3=function(){
 
 sparcs.initMap=function(){
     // set default map center as Suffolk county map center
-    var current_center = {lat: 40.9332373, lng: -72.7924525};
-    var current_zoom =8;
+    if(sparcs.map){
+        sparcs.initMap.current_zoom = sparcs.map.zoom
+        sparcs.initMap.current_center = {lat:sparcs.map.getCenter().lat(),lng:sparcs.map.getCenter().lng()}
+    }else{
+        sparcs.initMap.current_zoom = 8
+        sparcs.initMap.current_center = sparcs.initMap.current_center || {lat: 40.9332373, lng: -72.7924525};
+    }
     plotlyBarChartDiv.style.height=cmd.clientHeight+50
     sparcs.map=new google.maps.Map(document.getElementById('plotlyBarChartDiv'),{
         // set default center as in Suffolk county :
         //center: {lat: 40.9332373, lng: -72.7924525},
-        center: current_center,
+        center: sparcs.initMap.current_center,
         scrollwheel: false,
-        zoom: current_zoom
+        zoom: sparcs.initMap.current_zoom
     });
     console.log('clicked:',sparcs.clicked)
     
