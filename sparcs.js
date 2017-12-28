@@ -716,6 +716,8 @@ sparcs.initMap=function(){
                 fillColor:sparcs.color(v2norm[zi])
             })
             sparcs.polygons[v][i].setMap(sparcs.map)
+            sparcs.polygons[v][i].addListener('click',function(evt,that){sparcs.polyClick(evt,that,v,v2[zi])})
+            sparcs.polygons[v][i].addListener('mouseover',function(evt,that){sparcs.polyMouseover(evt,that,v,v2[zi])})
             //console.log(v,JSON.stringify(poly))
 
             
@@ -744,6 +746,46 @@ sparcs.color=function(val){
     }else{val = val*255
         return 'rgb('+sparcs.cPdf(val,255,35)+','+sparcs.cPdf(val,0,35) +','+sparcs.cPdf(val,100,35)+')'
     }
+}
+
+sparcs.polyClick=function(evt,that,z,c){ // zip, count 
+    var infowindow = new google.maps.InfoWindow({
+        content: 'zip3: '+z+', count: '+c
+    });
+    var marker = new google.maps.Marker({
+        position:{lat: evt.latLng.lat(), lng: evt.latLng.lng()},
+        map: sparcs.map,
+        title: 'zip3='+z
+    });
+    infowindow.open(sparcs.map, marker)
+    marker.addListener('click', function() {
+        if(infowindow.getMap()){ //if open, close
+            marker.setMap(null)
+        }else{ // open
+            infowindow.open(sparcs.map, marker);
+        }
+        
+    });
+    4
+}
+sparcs.polyMouseover=function(evt,that,z,c){ // zip, count
+    var div=document.getElementById('sparcsOverMsg')
+    if(!div){
+        div = document.createElement('div')
+        div.id='sparcsOverMsg'
+        div.style.position="fixed"
+        div.style.display="none"
+        document.body.appendChild(div)
+    }
+    div.style.display="block"
+    div.innerHTML='zip3: '+z+', count: '+c
+    div.style.top=evt.xa.clientY
+    div.style.left=evt.xa.clientX
+    if(div.t){clearTimeout(div.t)} // reset timer
+    div.t=setTimeout(function(){
+        div.style.display="none"
+    },2000)
+    4
 }
 
 
