@@ -644,7 +644,7 @@ sparcs.youtube=function(){
 
 sparcs.zip3=function(){
     console.log('loading 3-digit zip code shape files ...')
-    sparcs.getJSON('/sparcs/zip3.json')
+    sparcs.getJSON('/sparcs/zip3.geojson')
       .then(function(x){
           sparcs.zip3.geometry={}
           x.features.forEach(function(xi){
@@ -797,8 +797,11 @@ sparcs.polyMouseover=function(evt,that,z,c){ // zip, count
 
 
 
-
-sparcs()
+if(document.location.protocol=='http:'&&(!document.location.origin.match('http://localhost'))){
+    document.location.protocol='https:'
+}else{
+    sparcs()
+}
 
 if(typeof(mathbiol)){
 
