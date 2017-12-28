@@ -704,7 +704,7 @@ sparcs.initMap=function(){
     var polygons=v1.map(function(v,zi){
         //console.log('zip3=',v)
         sparcs.polygons[v]=[] // v = zip3
-        console.log(v,sparcs.zip3.geometry[v])
+        //console.log(v,sparcs.zip3.geometry[v])
         sparcs.zip3.geometry[v].coordinates.forEach(function(g,i){
             // get the individual polygon 
             var poly=g.map(function(gi){
@@ -719,14 +719,19 @@ sparcs.initMap=function(){
             sparcs.polygons[v][i].addListener('click',function(evt,that){sparcs.polyClick(evt,that,v,v2[zi])})
             sparcs.polygons[v][i].addListener('mouseover',function(evt,that){sparcs.polyMouseover(evt,that,v,v2[zi])})
             //console.log(v,JSON.stringify(poly))
-
-            
-
-            4
-
         })
+
         4
     })
+    // background color of tds in that column
+    var colIndex = sparcs.table.colVals.indexOf(sparcs.clicked.textContent)
+    sparcs.table.tds.map(function(row){
+        return row[colIndex]
+    }).forEach(function(td){
+        //td.style.backgroundColor=sparcs.color(parseInt(td.textContent)/v2max)
+        td.style.backgroundColor=sparcs.color(parseInt(td.textContent)/v2max).replace(')',',0.5)').replace('rgb','rgba')
+    })
+    4
 
 
     //debugger
@@ -786,7 +791,7 @@ sparcs.polyMouseover=function(evt,that,z,c){ // zip, count
     if(div.t){clearTimeout(div.t)} // reset timer
     div.t=setTimeout(function(){
         div.style.display="none"
-    },2000)
+    },1000)
     4
 }
 
