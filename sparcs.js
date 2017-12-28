@@ -644,7 +644,7 @@ sparcs.youtube=function(){
 
 sparcs.zip3=function(){
     console.log('loading 3-digit zip code shape files ...')
-    sparcs.getJSON('/sparcs/zip3.geojson')
+    sparcs.getJSON('/sparcs/zip3.json')
       .then(function(x){
           sparcs.zip3.geometry={}
           x.features.forEach(function(xi){
