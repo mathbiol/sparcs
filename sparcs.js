@@ -702,7 +702,7 @@ sparcs.initMap=function(){
     // ready for polygons
     sparcs.polygons={}
     var polygons=v1.map(function(v,zi){
-        console.log('zip3=',v)
+        //console.log('zip3=',v)
         sparcs.polygons[v]=[] // v = zip3
         console.log(v,sparcs.zip3.geometry[v])
         sparcs.zip3.geometry[v].coordinates.forEach(function(g,i){
@@ -749,8 +749,10 @@ sparcs.color=function(val){
 }
 
 sparcs.polyClick=function(evt,that,z,c){ // zip, count 
+    var colInd = sparcs.table.colVals.indexOf(sparcs.clicked.textContent)
+    var rowInd = sparcs.table.rowVals.indexOf(z)
     var infowindow = new google.maps.InfoWindow({
-        content: 'zip3: '+z+', count: '+c
+        content: 'zip3: <b>'+z+'</b>, count: <a href="'+sparcs.table.tds[rowInd][colInd].firstChild.href+'" target="_blank">'+c+'</a>'
     });
     var marker = new google.maps.Marker({
         position:{lat: evt.latLng.lat(), lng: evt.latLng.lng()},
