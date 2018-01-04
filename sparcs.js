@@ -43,17 +43,39 @@ sparcs.getJSON=function(url){
         }
         return x
     }
+    var fixLengthOfStay=function(x){
+        if(Array.isArray(x)){
+            if(x[0].length_of_stay){
+                x=x.map(function(xi){
+                    var L=xi.length_of_stay.length
+                    if(L<3){
+                        if(L==1){
+                            xi.length_of_stay='00'+xi.length_of_stay
+                        }else{ //L==2
+                            xi.length_of_stay='0'+xi.length_of_stay
+                        }
+                    }
+                    return xi
+                })
+            }
+        }
+        return x      
+    }
     return new Promise(function(resolve, reject) {
       // do a thing, possibly async, then…
       localforage.getItem(url)
         .then(function(x){
             if(x){
-                resolve(fix2011(x))
+                x=fix2011(x)
+                x=fixLengthOfStay(x)
+                resolve(x)
             }else{
                 $.getJSON(url)
                  .then(function(x){
                   localforage.setItem(url,x)
-                  resolve(fix2011(x))
+                  x=fix2011(x)
+                  x=fixLengthOfStay(x)
+                  resolve(x)
                 })
                  .fail(function(err){reject(err)})
             }})
