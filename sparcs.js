@@ -34,10 +34,24 @@ sparcs.getJSON=function(url){
     if(url.match('n5y9-zanf')){ // fixing 2011 data structure
         url = url.replace(/age_group/g,'age')
     }
+    if(!url.match('82xm-y6g8')){ // before 2015
+        url = url.replace(/payment_typology/g,'source_of_payment')
+        //debugger
+    }
     function fix2011(x){
         if(url.match('n5y9-zanf')){ // fix misslabeling of .age_group and .age
             x=x.map(function(xi){
                 xi.age_group=xi.age
+                return xi
+            })
+        }
+        return x
+    }
+    function fixBefore2015(x){
+        if(!url.match('82xm-y6g8')&&Array.isArray(x)){ // fix misslabeling of .age_group and .age
+            x=x.map(function(xi){
+                xi.payment_typology_1=xi.source_of_payment_1
+                xi.payment_typology_2=xi.source_of_payment_2
                 return xi
             })
         }
@@ -88,6 +102,7 @@ sparcs.getJSON=function(url){
         .then(function(x){
             if(x){
                 x=fix2011(x)
+                x=fixBefore2015(x)
                 x=fixLengthOfStay(x)
                 resolve(x)
             }else{
