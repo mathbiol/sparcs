@@ -45,6 +45,26 @@ sparcs.getJSON=function(url){
     }
     var fixLengthOfStay=function(x){
         if(Array.isArray(x)){
+            var zeros=function(n){
+                var zz=''
+                for(var i=0 ; i<n ; i++){zz=zz+'0'}
+                return zz
+            }
+            
+            var fixCode=function(varName,Lmin){  // note x will be picked from teh scope of the function
+                if(x[0][varName]){
+                    x.forEach(function(xi){
+                        var L=xi[varName].length
+                        xi[varName]=zeros(Lmin-xi[varName].length)+xi[varName]
+                    })
+                }
+            }
+            fixCode('length_of_stay',3)
+            fixCode('ccs_diagnosis_code',3)
+            fixCode('ccs_procedure_code',3)
+            fixCode('apr_drg_code',3)
+            fixCode('apr_mdc_code',2)
+            /*
             if(x[0].length_of_stay){
                 x=x.map(function(xi){
                     var L=xi.length_of_stay.length
@@ -58,6 +78,7 @@ sparcs.getJSON=function(url){
                     return xi
                 })
             }
+            */
         }
         return x      
     }
@@ -102,9 +123,9 @@ sparcs.countCounty=function(){
     var pp =[] // promises
     // get variables
     pp.push(
-        sparcs.getJSON('https://health.data.ny.gov/resource/pzzw-8zdv.json?$limit=1')
-         .then(function(x){ // sampling one reccord from 2014
-            sparcs.vars=Object.getOwnPropertyNames(x[0])
+        sparcs.getJSON(sparcs.urls[2015].url+'.json?$limit=1') // sampling one reccord from 2015
+         .then(function(x){ 
+            sparcs.vars=Object.getOwnPropertyNames(x[0]).sort()
           })
     )
     sparcs.years.forEach(function(yr){
