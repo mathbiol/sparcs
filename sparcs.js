@@ -408,7 +408,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     filterMoreDiv.appendChild(filterParm)
     */
 
-
+    yearSelect.value="2015" // default year 
     // reactive adjustments
     cmd.onmouseup=cmd.onmouseleave=function(){cmdMsgPre.style.width=cmd.style.width}
 }
