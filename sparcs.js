@@ -10,7 +10,13 @@ sparcs = function(){
         h+= '<ol id="sparcsYearsInfo"></ol>'
         h+= '<p>For more information type <span id="typeHelpSparcs" style="background-color:black;color:yellowgreen;cursor:pointer">&nbsp;help sparcs&nbsp;</span> (or click on me).<br> For a 10 min demo have a look at this <a href="https://www.youtube.com/watch?v=NZkJeT6R_H4" target="_blank" style="background-color:red;color:white">&nbsp;YouTube video </a>.</p>'
         cmdSide.innerHTML=h
-        sparcs.countCounty().then(_=>sparcs.rangeUI())
+        sparcs.countCounty().then(_=>{
+            sparcs.rangeUI()
+            yearSelect.selectedIndex=2 // 2011
+            setTimeout(yearSelect.onchange,1000)
+            //yearSelect.onchange()
+            //debugger
+        })
         typeHelpSparcs.onclick=function(){
             mathbiol.sys.cmdSlow('help sparcs')
         }
@@ -31,7 +37,7 @@ sparcs.urls={
 }
 sparcs.years=Object.getOwnPropertyNames(sparcs.urls)
 
-sparcs.getJSON=function(url){
+sparcs.getJSON=function(url,el){
     if(url.match('n5y9-zanf')){ // fixing 2011 data structure
         url = url.replace(/age_group/g,'age')
     }
@@ -114,7 +120,11 @@ sparcs.getJSON=function(url){
                   x=fixLengthOfStay(x)
                   resolve(x)
                 })
-                 .fail(function(err){reject(err)})
+                 .fail(function(err){
+                     //console.log(err.responseJSON.message,el)
+                     if(el){el.innerText=err.responseJSON.message}
+                     reject(err)
+                })
             }})
     })
 }
@@ -139,7 +149,7 @@ sparcs.countCounty=function(){
     var pp =[] // promises
     // get variables
     pp.push(
-        sparcs.getJSON(sparcs.urls[2015].url+'.json?$limit=1') // sampling one reccord from 2015
+        sparcs.getJSON(sparcs.urls[2011].url+'.json?$limit=1') // sampling one reccord from 2011
          .then(function(x){ 
             sparcs.vars=Object.getOwnPropertyNames(x[0]).sort()
           })
@@ -153,7 +163,7 @@ sparcs.countCounty=function(){
         var url = sparcs.urls[yr].url
         // https://dev.socrata.com/docs/queries/
         // https://dev.socrata.com/docs/functions
-        pp.push(sparcs.getJSON(url+'?$select=hospital_county,%20count(*)&$group=hospital_county&$limit=10000')
+        pp.push(sparcs.getJSON(url+'?$select=hospital_county,%20count(*)&$group=hospital_county&$limit=10000',li.querySelector('span'))
          .then(function(x){
             sparcs.urls[yr].count=0
             x.forEach(function(xi){
@@ -167,7 +177,7 @@ sparcs.countCounty=function(){
         }))
     })
     //console.log(pp)
-    return Promise.all(pp)
+    return Promise.allSettled(pp)
 }
 sparcs.match=function(patt,q){
     q='('+q.replace(/\s*\,\s*/g,')|(')+')'
@@ -408,7 +418,7 @@ sparcs.rangeUI=function(div){ // assemple UI with ranges
     filterMoreDiv.appendChild(filterParm)
     */
 
-    yearSelect.value="2015" // default year 
+    //yearSelect.value="2011" // default year 
     // reactive adjustments
     cmd.onmouseup=cmd.onmouseleave=function(){cmdMsgPre.style.width=cmd.style.width}
 }
