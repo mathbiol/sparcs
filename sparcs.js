@@ -178,7 +178,8 @@ sparcs.countCounty=function(){
         }))
     })
     //console.log(pp)
-    return Promise.allSettled(pp)
+    //return Promise.allSettled(pp)
+    return Promise.all(pp)
 }
 sparcs.match=function(patt,q){
     q='('+q.replace(/\s*\,\s*/g,')|(')+')'
