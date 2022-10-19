@@ -35,7 +35,7 @@ sparcs.urls={
     "2015":{url:"https://health.data.ny.gov/resource/82xm-y6g8"},
     "2016":{url:"https://health.data.ny.gov/resource/gnzp-ekau"},
     "2017":{url:"https://health.data.ny.gov/resource/22g3-z7e7"},
-    //"2018":{url:"https://health.data.ny.gov/resource/yjgt-tq93"}
+    "2018":{url:"https://health.data.ny.gov/resource/yjgt-tq93"}
 }
 sparcs.years=Object.getOwnPropertyNames(sparcs.urls)
 
@@ -46,6 +46,11 @@ sparcs.getJSON=function(url,el){
     if(!url.match('82xm-y6g8')){ // before 2015
         url = url.replace(/payment_typology/g,'source_of_payment')
         //debugger
+    }
+    // fix 2018
+    // s=document.createElement('script');s.src='http://localhost:8000/sparcs/sparcs.js';document.body.appendChild(s)
+    function fix2018(x){
+        debugger
     }
     function fix2011(x){
         if(url.match('n5y9-zanf')){ // fix misslabeling of .age_group and .age
@@ -113,6 +118,7 @@ sparcs.getJSON=function(url,el){
                 x=fix2011(x)
                 x=fixBefore2015(x)
                 x=fixLengthOfStay(x)
+                x=fix2018(x)
                 resolve(x)
             }else{
                 $.getJSON(url)
