@@ -50,7 +50,7 @@ sparcs.getJSON=function(url,el){
     // fix 2018
     // s=document.createElement('script');s.src='http://localhost:8000/sparcs/sparcs.js';document.body.appendChild(s)
     function fix2018(x){
-        debugger
+        //debugger
     }
     function fix2011(x){
         if(url.match('n5y9-zanf')){ // fix misslabeling of .age_group and .age
