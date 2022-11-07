@@ -118,7 +118,7 @@ sparcs.getJSON=function(url,el){
                 x=fix2011(x)
                 x=fixBefore2015(x)
                 x=fixLengthOfStay(x)
-                x=fix2018(x)
+                // x=fix2018(x)
                 resolve(x)
             }else{
                 $.getJSON(url)
